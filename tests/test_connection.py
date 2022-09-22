@@ -240,6 +240,7 @@ async def test_connection_state_close_session() -> None:
 
     assert not connection.is_connected
 
+
 @pytest.mark.asyncio
 async def test_connection_state_2_distincts() -> None:
     connection_a = ETPConnection()

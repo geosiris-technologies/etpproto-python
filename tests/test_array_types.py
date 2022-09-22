@@ -8,12 +8,19 @@ from io import BytesIO
 from etptypes import avro_schema
 
 from etptypes.energistics.etp.v12.datatypes.any_array import AnyArray
-from etptypes.energistics.etp.v12.datatypes.array_of_boolean import ArrayOfBoolean 
-from etptypes.energistics.etp.v12.datatypes.array_of_int import ArrayOfInt 
-from etptypes.energistics.etp.v12.datatypes.array_of_long import ArrayOfLong 
-from etptypes.energistics.etp.v12.datatypes.array_of_float import ArrayOfFloat 
-from etptypes.energistics.etp.v12.datatypes.array_of_double import ArrayOfDouble 
-from etptypes.energistics.etp.v12.datatypes.array_of_string import ArrayOfString 
+from etptypes.energistics.etp.v12.datatypes.array_of_boolean import (
+    ArrayOfBoolean,
+)
+from etptypes.energistics.etp.v12.datatypes.array_of_int import ArrayOfInt
+from etptypes.energistics.etp.v12.datatypes.array_of_long import ArrayOfLong
+from etptypes.energistics.etp.v12.datatypes.array_of_float import ArrayOfFloat
+from etptypes.energistics.etp.v12.datatypes.array_of_double import (
+    ArrayOfDouble,
+)
+from etptypes.energistics.etp.v12.datatypes.array_of_string import (
+    ArrayOfString,
+)
+
 
 @pytest.mark.asyncio
 async def test_get_ArrayOfBoolean() -> None:
@@ -22,19 +29,24 @@ async def test_get_ArrayOfBoolean() -> None:
     bio = BytesIO()
 
     objSchema = json.loads(avro_schema(AnyArray))
-    schemaless_writer(bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False)
+    schemaless_writer(
+        bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False
+    )
 
     bio.seek(0)
 
-    object_res = AnyArray.parse_obj(schemaless_reader(
-        bio,
-        json.loads(avro_schema(AnyArray)),
-        return_record_name=True,
-        return_record_name_override=True,
-    ))
+    object_res = AnyArray.parse_obj(
+        schemaless_reader(
+            bio,
+            json.loads(avro_schema(AnyArray)),
+            return_record_name=True,
+            return_record_name_override=True,
+        )
+    )
 
     assert isinstance(object_res, AnyArray)
     assert isinstance(object_res.item, ArrayOfBoolean)
+
 
 @pytest.mark.asyncio
 async def test_get_ArrayOfFloat() -> None:
@@ -43,19 +55,24 @@ async def test_get_ArrayOfFloat() -> None:
     bio = BytesIO()
 
     objSchema = json.loads(avro_schema(AnyArray))
-    schemaless_writer(bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False)
+    schemaless_writer(
+        bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False
+    )
 
     bio.seek(0)
 
-    object_res = AnyArray.parse_obj(schemaless_reader(
-        bio,
-        json.loads(avro_schema(AnyArray)),
-        return_record_name=True,
-        return_record_name_override=True,
-    ))
+    object_res = AnyArray.parse_obj(
+        schemaless_reader(
+            bio,
+            json.loads(avro_schema(AnyArray)),
+            return_record_name=True,
+            return_record_name_override=True,
+        )
+    )
 
     assert isinstance(object_res, AnyArray)
     assert isinstance(object_res.item, ArrayOfFloat)
+
 
 @pytest.mark.asyncio
 async def test_get_ArrayOfDouble() -> None:
@@ -64,19 +81,24 @@ async def test_get_ArrayOfDouble() -> None:
     bio = BytesIO()
 
     objSchema = json.loads(avro_schema(AnyArray))
-    schemaless_writer(bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False)
+    schemaless_writer(
+        bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False
+    )
 
     bio.seek(0)
 
-    object_res = AnyArray.parse_obj(schemaless_reader(
-        bio,
-        json.loads(avro_schema(AnyArray)),
-        return_record_name=True,
-        return_record_name_override=True,
-    ))
+    object_res = AnyArray.parse_obj(
+        schemaless_reader(
+            bio,
+            json.loads(avro_schema(AnyArray)),
+            return_record_name=True,
+            return_record_name_override=True,
+        )
+    )
 
     assert isinstance(object_res, AnyArray)
     assert isinstance(object_res.item, ArrayOfDouble)
+
 
 @pytest.mark.asyncio
 async def test_get_ArrayOfInt() -> None:
@@ -85,19 +107,24 @@ async def test_get_ArrayOfInt() -> None:
     bio = BytesIO()
 
     objSchema = json.loads(avro_schema(AnyArray))
-    schemaless_writer(bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False)
+    schemaless_writer(
+        bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False
+    )
 
     bio.seek(0)
 
-    object_res = AnyArray.parse_obj(schemaless_reader(
-        bio,
-        json.loads(avro_schema(AnyArray)),
-        return_record_name=True,
-        return_record_name_override=True,
-    ))
+    object_res = AnyArray.parse_obj(
+        schemaless_reader(
+            bio,
+            json.loads(avro_schema(AnyArray)),
+            return_record_name=True,
+            return_record_name_override=True,
+        )
+    )
 
     assert isinstance(object_res, AnyArray)
     assert isinstance(object_res.item, ArrayOfInt)
+
 
 @pytest.mark.asyncio
 async def test_get_ArrayOfLong() -> None:
@@ -106,19 +133,24 @@ async def test_get_ArrayOfLong() -> None:
     bio = BytesIO()
 
     objSchema = json.loads(avro_schema(AnyArray))
-    schemaless_writer(bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False)
+    schemaless_writer(
+        bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False
+    )
 
     bio.seek(0)
 
-    object_res = AnyArray.parse_obj(schemaless_reader(
-        bio,
-        json.loads(avro_schema(AnyArray)),
-        return_record_name=True,
-        return_record_name_override=True,
-    ))
+    object_res = AnyArray.parse_obj(
+        schemaless_reader(
+            bio,
+            json.loads(avro_schema(AnyArray)),
+            return_record_name=True,
+            return_record_name_override=True,
+        )
+    )
 
     assert isinstance(object_res, AnyArray)
     assert isinstance(object_res.item, ArrayOfLong)
+
 
 @pytest.mark.asyncio
 async def test_get_ArrayOfString() -> None:
@@ -127,19 +159,24 @@ async def test_get_ArrayOfString() -> None:
     bio = BytesIO()
 
     objSchema = json.loads(avro_schema(AnyArray))
-    schemaless_writer(bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False)
+    schemaless_writer(
+        bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False
+    )
 
     bio.seek(0)
 
-    object_res = AnyArray.parse_obj(schemaless_reader(
-        bio,
-        json.loads(avro_schema(AnyArray)),
-        return_record_name=True,
-        return_record_name_override=True,
-    ))
+    object_res = AnyArray.parse_obj(
+        schemaless_reader(
+            bio,
+            json.loads(avro_schema(AnyArray)),
+            return_record_name=True,
+            return_record_name_override=True,
+        )
+    )
 
     assert isinstance(object_res, AnyArray)
     assert isinstance(object_res.item, ArrayOfString)
+
 
 @pytest.mark.asyncio
 async def test_get_bytes() -> None:
@@ -148,16 +185,20 @@ async def test_get_bytes() -> None:
     bio = BytesIO()
 
     objSchema = json.loads(avro_schema(AnyArray))
-    schemaless_writer(bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False)
+    schemaless_writer(
+        bio, objSchema, array.dict(by_alias=True), disable_tuple_notation=False
+    )
 
     bio.seek(0)
 
-    object_res = AnyArray.parse_obj(schemaless_reader(
-        bio,
-        json.loads(avro_schema(AnyArray)),
-        return_record_name=True,
-        return_record_name_override=True,
-    ))
+    object_res = AnyArray.parse_obj(
+        schemaless_reader(
+            bio,
+            json.loads(avro_schema(AnyArray)),
+            return_record_name=True,
+            return_record_name_override=True,
+        )
+    )
 
     assert isinstance(object_res, AnyArray)
     assert isinstance(object_res.item, bytes)

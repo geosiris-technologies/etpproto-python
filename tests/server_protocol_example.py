@@ -104,6 +104,7 @@ from etptypes.energistics.etp.v12.protocol.discovery_query.find_resources_respon
 from etptypes.energistics.etp.v12.protocol.discovery_query.find_resources import (
     FindResources,
 )
+
 # =========================== GROWING OBJECT PROTOCOL
 from etptypes.energistics.etp.v12.protocol.growing_object_query.find_parts import (
     FindParts,
@@ -119,7 +120,89 @@ from etptypes.energistics.etp.v12.protocol.store_query.find_data_objects import 
 from etptypes.energistics.etp.v12.protocol.store_query.find_data_objects_response import (
     FindDataObjectsResponse,
 )
-from etptypes.energistics.etp.v12.datatypes.object.data_object import DataObject
+from etptypes.energistics.etp.v12.datatypes.object.data_object import (
+    DataObject,
+)
+
+# =========================== GROWING OBJECT PROTOCOL
+from etptypes.energistics.etp.v12.protocol.growing_object.delete_parts import (
+    DeleteParts,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.delete_parts_response import (
+    DeletePartsResponse,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_change_annotations import (
+    GetChangeAnnotations,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_change_annotations_response import (
+    GetChangeAnnotationsResponse,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_growing_data_objects_header import (
+    GetGrowingDataObjectsHeader,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_growing_data_objects_header_response import (
+    GetGrowingDataObjectsHeaderResponse,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_parts import (
+    GetParts,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_parts_by_range import (
+    GetPartsByRange,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_parts_by_range_response import (
+    GetPartsByRangeResponse,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_parts_metadata import (
+    GetPartsMetadata,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_parts_metadata_response import (
+    GetPartsMetadataResponse,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.get_parts_response import (
+    GetPartsResponse,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.put_growing_data_objects_header import (
+    PutGrowingDataObjectsHeader,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.put_growing_data_objects_header_response import (
+    PutGrowingDataObjectsHeaderResponse,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.put_parts import (
+    PutParts,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.put_parts_response import (
+    PutPartsResponse,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.replace_parts_by_range import (
+    ReplacePartsByRange,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object.replace_parts_by_range_response import (
+    ReplacePartsByRangeResponse,
+)
+from etptypes.energistics.etp.v12.datatypes.object.change_response_info import (
+    ChangeResponseInfo,
+)
+from etptypes.energistics.etp.v12.datatypes.object.object_part import (
+    ObjectPart,
+)
+from etptypes.energistics.etp.v12.datatypes.object.parts_metadata_info import (
+    PartsMetadataInfo,
+)
+from etptypes.energistics.etp.v12.datatypes.channel_data.index_metadata_record import (
+    IndexMetadataRecord,
+)
+from etptypes.energistics.etp.v12.datatypes.channel_data.channel_index_kind import (
+    ChannelIndexKind,
+)
+
+from etptypes.energistics.etp.v12.datatypes.object.index_interval import (
+    IndexInterval,
+)
+
+from etptypes.energistics.etp.v12.datatypes.channel_data.index_direction import (
+    IndexDirection,
+)
+from etptypes.energistics.etp.v12.datatypes.index_value import IndexValue
 
 # ===========================
 
@@ -138,6 +221,7 @@ from etpproto.protocols.discovery import DiscoveryHandler
 from etpproto.protocols.discovery_query import DiscoveryQueryHandler
 from etpproto.protocols.growing_object_query import GrowingObjectQueryHandler
 from etpproto.protocols.store_query import StoreQueryHandler
+from etpproto.protocols.growing_object import GrowingObjectHandler
 
 #    ______                                    __                   __
 #   / ____/___  ________     ____  _________  / /_____  _________  / /
@@ -232,7 +316,9 @@ class myDataspaceProtocol(DataspaceHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            DeleteDataspacesResponse(success={k: True for k, v in msg.uris.items()}), 
+            DeleteDataspacesResponse(
+                success={k: True for k, v in msg.uris.items()}
+            ),
             correlation_id=msg_header.message_id,
         )
 
@@ -243,16 +329,20 @@ class myDataspaceProtocol(DataspaceHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            GetDataspacesResponse(dataspaces=[
-                Dataspace(uri="dataspace-default-0",
-                            store_last_write=0,
-                            store_created=0),
-
-                Dataspace(uri="dataspace-default-1",
-                            store_last_write=0,
-                            store_created=0), 
+            GetDataspacesResponse(
+                dataspaces=[
+                    Dataspace(
+                        uri="dataspace-default-0",
+                        store_last_write=0,
+                        store_created=0,
+                    ),
+                    Dataspace(
+                        uri="dataspace-default-1",
+                        store_last_write=0,
+                        store_created=0,
+                    ),
                 ]
-            ), 
+            ),
             correlation_id=msg_header.message_id,
         )
 
@@ -263,9 +353,12 @@ class myDataspaceProtocol(DataspaceHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            PutDataspacesResponse(success={k: True for k, v in msg.dataspaces.items()}), 
+            PutDataspacesResponse(
+                success={k: True for k, v in msg.dataspaces.items()}
+            ),
             correlation_id=msg_header.message_id,
         )
+
 
 #     ____  ___  _________         ___    ____  ____  _____  __
 #    / __ \/   |/_  __/   |       /   |  / __ \/ __ \/   \ \/ /
@@ -273,6 +366,7 @@ class myDataspaceProtocol(DataspaceHandler):
 #  / /_/ / ___ |/ / / ___ |     / ___ |/ _, _/ _, _/ ___ |/ /
 # /_____/_/  |_/_/ /_/  |_|____/_/  |_/_/ |_/_/ |_/_/  |_/_/
 #                        /_____/
+
 
 @ETPConnection.on(CommunicationProtocol.DATA_ARRAY)
 class myDataArrayProtocol(DataArrayHandler):
@@ -283,16 +377,18 @@ class myDataArrayProtocol(DataArrayHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            GetDataArrayMetadataResponse(array_metadata={
-                k: 
-                    DataArrayMetadata(
+            GetDataArrayMetadataResponse(
+                array_metadata={
+                    k: DataArrayMetadata(
                         dimensions=[1],
                         transport_array_type=AnyArrayType.ARRAY_OF_BOOLEAN,
                         logical_array_type=AnyLogicalArrayType.ARRAY_OF_BOOLEAN,
                         store_last_write=0,
                         store_created=0,
                     )
-                for k, v in msg.data_arrays.items()}), 
+                    for k, v in msg.data_arrays.items()
+                }
+            ),
             correlation_id=msg_header.message_id,
         )
 
@@ -303,13 +399,15 @@ class myDataArrayProtocol(DataArrayHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            GetDataArraysResponse(data_arrays={
-                k: 
-                    DataArray(
+            GetDataArraysResponse(
+                data_arrays={
+                    k: DataArray(
                         dimensions=[1],
-                        data=AnyArray(item=ArrayOfFloat(values=[3.2, 1.0]))
+                        data=AnyArray(item=ArrayOfFloat(values=[3.2, 1.0])),
                     )
-                for k, v in msg.data_arrays.items()}), 
+                    for k, v in msg.data_arrays.items()
+                }
+            ),
             correlation_id=msg_header.message_id,
         )
 
@@ -320,13 +418,15 @@ class myDataArrayProtocol(DataArrayHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            GetDataSubarraysResponse(data_subarrays={
-                k: 
-                    DataArray(
+            GetDataSubarraysResponse(
+                data_subarrays={
+                    k: DataArray(
                         dimensions=[1],
-                        data=AnyArray(item=ArrayOfFloat(values=[3.2, 1.0]))
+                        data=AnyArray(item=ArrayOfFloat(values=[3.2, 1.0])),
                     )
-                for k, v in msg.data_subarrays.items()}), 
+                    for k, v in msg.data_subarrays.items()
+                }
+            ),
             correlation_id=msg_header.message_id,
         )
 
@@ -337,9 +437,9 @@ class myDataArrayProtocol(DataArrayHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            PutDataArraysResponse(success={
-                k: True
-                for k, v in msg.data_arrays.items()}), 
+            PutDataArraysResponse(
+                success={k: True for k, v in msg.data_arrays.items()}
+            ),
             correlation_id=msg_header.message_id,
         )
 
@@ -350,9 +450,9 @@ class myDataArrayProtocol(DataArrayHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            PutDataSubarraysResponse(success={
-                k: True
-                for k, v in msg.data_subarrays.items()}), 
+            PutDataSubarraysResponse(
+                success={k: True for k, v in msg.data_subarrays.items()}
+            ),
             correlation_id=msg_header.message_id,
         )
 
@@ -363,11 +463,12 @@ class myDataArrayProtocol(DataArrayHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            PutUninitializedDataArraysResponse(success={
-                k: True
-                for k, v in msg.data_arrays.items()}), 
+            PutUninitializedDataArraysResponse(
+                success={k: True for k, v in msg.data_arrays.items()}
+            ),
             correlation_id=msg_header.message_id,
         )
+
 
 #     ____  _
 #    / __ \(_)_____________ _   _____  _______  __
@@ -375,6 +476,7 @@ class myDataArrayProtocol(DataArrayHandler):
 #  / /_/ / (__  ) /__/ /_/ / |/ /  __/ /  / /_/ /
 # /_____/_/____/\___/\____/|___/\___/_/   \__, /
 #                                        /____/
+
 
 @ETPConnection.on(CommunicationProtocol.DISCOVERY)
 class MyDiscoveryHandler(DiscoveryHandler):
@@ -385,14 +487,18 @@ class MyDiscoveryHandler(DiscoveryHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            GetDeletedResourcesResponse(deleted_resources=[
-                DeletedResource(
-                    uri = "eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
-                    deleted_time = 0),
-                DeletedResource(
-                    uri = "eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
-                    deleted_time = 0)
-                ]), 
+            GetDeletedResourcesResponse(
+                deleted_resources=[
+                    DeletedResource(
+                        uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                        deleted_time=0,
+                    ),
+                    DeletedResource(
+                        uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                        deleted_time=0,
+                    ),
+                ]
+            ),
             correlation_id=msg_header.message_id,
         )
 
@@ -403,7 +509,8 @@ class MyDiscoveryHandler(DiscoveryHandler):
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
-            GetResourcesResponse(resources=[
+            GetResourcesResponse(
+                resources=[
                     Resource(
                         uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
                         name="Test Name 0",
@@ -423,11 +530,12 @@ class MyDiscoveryHandler(DiscoveryHandler):
                         store_last_write=0,
                         store_created=0,
                         active_status=ActiveStatusKind.ACTIVE,
-                    )
+                    ),
                 ]
-                ), 
+            ),
             correlation_id=msg_header.message_id,
         )
+
 
 #     ____  _                                      ____
 #    / __ \(_)_____________ _   _____  _______  __/ __ \__  _____  _______  __
@@ -435,6 +543,7 @@ class MyDiscoveryHandler(DiscoveryHandler):
 #  / /_/ / (__  ) /__/ /_/ / |/ /  __/ /  / /_/ / /_/ / /_/ /  __/ /  / /_/ /
 # /_____/_/____/\___/\____/|___/\___/_/   \__, /\___\_\__,_/\___/_/   \__, /
 #                                        /____/                      /____/
+
 
 @ETPConnection.on(CommunicationProtocol.DISCOVERY_QUERY)
 class MyDiscoveryQueryHandler(DiscoveryQueryHandler):
@@ -446,32 +555,33 @@ class MyDiscoveryQueryHandler(DiscoveryQueryHandler):
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
             FindResourcesResponse(
-                    server_sort_order="",
-                    resources=[
-                        Resource(
-                            uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
-                            name="Test Name 0",
-                            source_count=0,
-                            target_count=0,
-                            last_changed=0,
-                            store_last_write=0,
-                            store_created=0,
-                            active_status=ActiveStatusKind.ACTIVE,
-                        ),
-                        Resource(
-                            uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
-                            name="Test Name 0",
-                            source_count=0,
-                            target_count=0,
-                            last_changed=0,
-                            store_last_write=0,
-                            store_created=0,
-                            active_status=ActiveStatusKind.ACTIVE,
-                        )
-                    ],
-                ), 
+                server_sort_order="",
+                resources=[
+                    Resource(
+                        uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                        name="Test Name 0",
+                        source_count=0,
+                        target_count=0,
+                        last_changed=0,
+                        store_last_write=0,
+                        store_created=0,
+                        active_status=ActiveStatusKind.ACTIVE,
+                    ),
+                    Resource(
+                        uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                        name="Test Name 0",
+                        source_count=0,
+                        target_count=0,
+                        last_changed=0,
+                        store_last_write=0,
+                        store_created=0,
+                        active_status=ActiveStatusKind.ACTIVE,
+                    ),
+                ],
+            ),
             correlation_id=msg_header.message_id,
         )
+
 
 #    ______                   _             ____  __      _           __  ____
 #   / ____/________ _      __(_)___  ____ _/ __ \/ /_    (_)__  _____/ /_/ __ \__  _____  _______  __
@@ -479,6 +589,7 @@ class MyDiscoveryQueryHandler(DiscoveryQueryHandler):
 # / /_/ / /  / /_/ / |/ |/ / / / / / /_/ / /_/ / /_/ / / /  __/ /__/ /_/ /_/ / /_/ /  __/ /  / /_/ /
 # \____/_/   \____/|__/|__/_/_/ /_/\__, /\____/_.___/_/ /\___/\___/\__/\___\_\__,_/\___/_/   \__, /
 #                                 /____/           /___/                                    /____/
+
 
 @ETPConnection.on(CommunicationProtocol.GROWING_OBJECT_QUERY)
 class MyGrowingObjectQueryHandler(GrowingObjectQueryHandler):
@@ -490,13 +601,14 @@ class MyGrowingObjectQueryHandler(GrowingObjectQueryHandler):
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
             FindPartsResponse(
-                    uri=msg.uri,
-                    server_sort_order="",
-                    format_=msg.format_,
-                    parts=[],
-                ), 
+                uri=msg.uri,
+                server_sort_order="",
+                format_=msg.format_,
+                parts=[],
+            ),
             correlation_id=msg_header.message_id,
         )
+
 
 #    _____ __                  ____
 #   / ___// /_____  ________  / __ \__  _____  _______  __
@@ -504,6 +616,7 @@ class MyGrowingObjectQueryHandler(GrowingObjectQueryHandler):
 #  ___/ / /_/ /_/ / /  /  __/ /_/ / /_/ /  __/ /  / /_/ /
 # /____/\__/\____/_/   \___/\___\_\__,_/\___/_/   \__, /
 #                                                /____/
+
 
 @ETPConnection.on(CommunicationProtocol.STORE_QUERY)
 class MyStoreQueryHandler(StoreQueryHandler):
@@ -515,24 +628,185 @@ class MyStoreQueryHandler(StoreQueryHandler):
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
             FindDataObjectsResponse(
-                    server_sort_order="",
-                    data_objects=[
-                            DataObject(
-                                resource=Resource(
-                                            uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
-                                            name="Test Name 0",
-                                            source_count=0,
-                                            target_count=0,
-                                            last_changed=0,
-                                            store_last_write=0,
-                                            store_created=0,
-                                            active_status=ActiveStatusKind.ACTIVE,
-                                        ),
-                                blob_id=None,
-                                format_="xml",
-                                data=""
+                server_sort_order="",
+                data_objects=[
+                    DataObject(
+                        resource=Resource(
+                            uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                            name="Test Name 0",
+                            source_count=0,
+                            target_count=0,
+                            last_changed=0,
+                            store_last_write=0,
+                            store_created=0,
+                            active_status=ActiveStatusKind.ACTIVE,
+                        ),
+                        blob_id=None,
+                        format_="xml",
+                        data="",
+                    ),
+                ],
+            ),
+            correlation_id=msg_header.message_id,
+        )
+
+
+#    ______                   _             ____  __      _           __
+#   / ____/________ _      __(_)___  ____ _/ __ \/ /_    (_)__  _____/ /_
+#  / / __/ ___/ __ \ | /| / / / __ \/ __ `/ / / / __ \  / / _ \/ ___/ __/
+# / /_/ / /  / /_/ / |/ |/ / / / / / /_/ / /_/ / /_/ / / /  __/ /__/ /_
+# \____/_/   \____/|__/|__/_/_/ /_/\__, /\____/_.___/_/ /\___/\___/\__/
+#                                 /____/           /___/
+
+
+@ETPConnection.on(CommunicationProtocol.GROWING_OBJECT)
+class MyGrowingObjectHandler(GrowingObjectHandler):
+    async def on_delete_parts(
+        self,
+        msg: DeleteParts,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            DeletePartsResponse(
+                success={k: True for k, v in msg.uids.items()}
+            ),
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_get_change_annotations(
+        self,
+        msg: GetChangeAnnotations,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            GetChangeAnnotationsResponse(changes={}),
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_get_growing_data_objects_header(
+        self,
+        msg: GetGrowingDataObjectsHeader,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            GetGrowingDataObjectsHeaderResponse(
+                data_objects={
+                    k: DataObject(
+                        resource=Resource(
+                            uri=v,
+                            name="Test Name 0",
+                            source_count=0,
+                            target_count=0,
+                            last_changed=0,
+                            store_last_write=0,
+                            store_created=0,
+                            active_status=ActiveStatusKind.ACTIVE,
+                        ),
+                        blob_id=None,
+                        format_="xml",
+                        data="",
+                    )
+                    for k, v in msg.uris.items()
+                }
+            ),
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_get_parts(
+        self,
+        msg: GetParts,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            GetPartsResponse(
+                uri=msg.uri,
+                parts={
+                    k: ObjectPart(uid=k, data=b"") for k, v in msg.uids.items()
+                },
+            ),
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_get_parts_by_range(
+        self,
+        msg: GetPartsByRange,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            GetPartsByRangeResponse(
+                uri=msg.uri,
+                parts=[ObjectPart(uid="a", data=b"")],
+            ),
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_get_parts_metadata(
+        self,
+        msg: GetPartsMetadata,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            GetPartsMetadataResponse(
+                metadata={
+                    k: PartsMetadataInfo(
+                        uri=k,
+                        name="My name " + k,
+                        index=IndexMetadataRecord(
+                            interval=IndexInterval(
+                                start_index=IndexValue(),
+                                end_index=IndexValue(),
+                                uom="",
+                                depth_datum="",
                             ),
-                    ],
-                ), 
+                            uom="",
+                            index_property_kind_uri="",
+                            index_kind=ChannelIndexKind.PRESSURE,
+                            direction=IndexDirection.INCREASING,
+                        ),
+                    )
+                    for k, v in msg.uris.items()
+                },
+            ),
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_put_growing_data_objects_header(
+        self,
+        msg: PutGrowingDataObjectsHeader,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            PutGrowingDataObjectsHeaderResponse(
+                success={k: True for k, v in msg.data_objects.items()}
+            ),
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_put_parts(
+        self,
+        msg: PutParts,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            PutPartsResponse(success={k: True for k, v in msg.parts.items()}),
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_replace_parts_by_range(
+        self,
+        msg: ReplacePartsByRange,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            ReplacePartsByRangeResponse(),
             correlation_id=msg_header.message_id,
         )

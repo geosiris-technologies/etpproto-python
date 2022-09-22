@@ -388,9 +388,7 @@ class Message(ABC):
                     return_record_name_override=True,
                 )
 
-                print(
-                    "HEADER", recMH, flush=True
-                )
+                print("HEADER", recMH, flush=True)
 
                 print(
                     "classmethod decode_binary_message", object_res, flush=True
