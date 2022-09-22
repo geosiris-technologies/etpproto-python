@@ -1,13 +1,13 @@
 ETP Protocol Implementation
 ==========
 
-[![License](https://img.shields.io/pypi/l/etpproto-python)](https://github.com/geosiris-technologies/etpproto-python/blob/main/LICENSE)
+[![License](https://img.shields.io/pypi/l/etpproto)](https://github.com/geosiris-technologies/etpproto-python/blob/main/LICENSE)
 [![Documentation Status](https://readthedocs.org/projects/etpproto-python/badge/?version=latest)](https://etpproto-python.readthedocs.io/en/latest/?badge=latest)
 [![Python CI](https://github.com/geosiris-technologies/etpproto-python/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/geosiris-technologies/etpproto-python/actions/workflows/ci-tests.yml)
 ![Python version](https://img.shields.io/pypi/pyversions/etpproto-python)
 [![PyPI](https://img.shields.io/pypi/v/etpproto-python)](https://badge.fury.io/py/etpproto-python)
 ![Status](https://img.shields.io/pypi/status/etpproto-python)
-[![codecov](https://codecov.io/gh/bp/etpproto-python/branch/master/graph/badge.svg)](https://codecov.io/gh/bp/etpproto-python)
+[![codecov](https://codecov.io/gh/geosiris-technologies/etpproto-python/branch/main/graph/badge.svg)](https://codecov.io/gh/geosiris-technologies/etpproto-python)
 
 
 
