@@ -106,9 +106,6 @@ jobs:
           pip install poetry-dynamic-versioning
 
       - name: Upload to PyPI
-        env:
-          POETRY_PYPI_TOKEN_TEST: ${{ secrets.POETRY_PYPI_TOKEN_TEST}}
-          POETRY_PYPI_TOKEN_PYPI: ${{ secrets.POETRY_PYPI_TOKEN_PYPI}}
         run: |
           poetry config repositories.test https://test.pypi.org/legacy/
           poetry publish --username ${{ secrets.POETRY_PYPI_TOKEN_USERNAME}} --password ${{ secrets.POETRY_PYPI_TOKEN_PASSWORD}}

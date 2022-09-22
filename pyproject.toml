@@ -4,7 +4,7 @@ build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "etpproto"
-version = "0.0.0" # Set at build time
+version = "1.0.0" # Set at build time
 description = "ETP protocol implementation"
 authors = [
     "Lionel Untereiner <lionel.untereiner@geosiris.com>"
