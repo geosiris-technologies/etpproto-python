@@ -26,6 +26,7 @@ docs/html
 build
 dist
 *.egg-info
+venv/
 
 # Dynamically-generated version
 resqpy/version.py

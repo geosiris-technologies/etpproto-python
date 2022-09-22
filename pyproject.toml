@@ -1,5 +1,5 @@
 [build-system]
-requires = ["poetry>=1.0.2", "poetry-dynamic-versioning"]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry]
@@ -16,11 +16,10 @@ maintainers = [
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/bp/resqpy"
-homepage = "www.geosiris.com"
+homepage = "http://www.geosiris.com"
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.9",
-    "License :: OSI Approved :: Apache Software License"
+    "License :: OSI Approved :: Apache Software License",
 ]
 keywords = ["ETP"]
 
@@ -63,7 +62,7 @@ exclude = '''
 '''
 
 [tool.pytest.ini_options]
-addopts = "-v --cache-clear -rf --cov=etpproto/ --cov-report=term --cov-report=html --junitxml=pytest.xml"
+addopts = ""
 console_output_style = "count"
 python_classes = "Test"
 python_files = "test_*.py"
@@ -77,3 +76,17 @@ source = ["etpproto"]
 
 [tool.pylint.format]
 max-line-length = "88"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+format-jinja = """
+    {%- if distance == 0 -%}
+        {{ serialize_pep440(base, stage, revision) }}
+    {%- elif revision is not none -%}
+        {{ serialize_pep440(base, stage, revision + 1, dev=distance) }}
+    {%- else -%}
+        {{ serialize_pep440(bump_version(base), stage, revision, dev=distance) }}
+    {%- endif -%}
+"""
