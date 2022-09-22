@@ -1,10 +1,10 @@
 [build-system]
-requires = ["poetry>=1.0.2", "poetry-dynamic-versioning"]
+requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
 build-backend = "poetry.masonry.api"
 
 [tool.poetry]
 name = "etpproto"
-version = "1.0.0" # Set at build time
+version = "0.0.0" # Set at build time
 description = "ETP protocol implementation"
 authors = [
     "Lionel Untereiner <lionel.untereiner@geosiris.com>"
@@ -77,3 +77,17 @@ source = ["etpproto"]
 
 [tool.pylint.format]
 max-line-length = "88"
+
+[tool.poetry-dynamic-versioning]
+enable = true
+vcs = "git"
+style = "pep440"
+format-jinja = """
+    {%- if distance == 0 -%}
+        {{ serialize_pep440(base, stage, revision) }}
+    {%- elif revision is not none -%}
+        {{ serialize_pep440(base, stage, revision + 1, dev=distance) }}
+    {%- else -%}
+        {{ serialize_pep440(bump_version(base), stage, revision, dev=distance) }}
+    {%- endif -%}
+"""
