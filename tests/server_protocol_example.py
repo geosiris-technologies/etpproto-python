@@ -73,6 +73,54 @@ from etptypes.energistics.etp.v12.datatypes.data_array_types.data_array_metadata
 from etpproto.protocols.data_array import *
 from etptypes.energistics.etp.v12.datatypes.any_array import AnyArray
 
+# =========================== DISCOVERY PROTOCOL
+from etptypes.energistics.etp.v12.protocol.discovery.get_deleted_resources import (
+    GetDeletedResources,
+)
+from etptypes.energistics.etp.v12.protocol.discovery.get_deleted_resources_response import (
+    GetDeletedResourcesResponse,
+)
+from etptypes.energistics.etp.v12.protocol.discovery.get_resources import (
+    GetResources,
+)
+from etptypes.energistics.etp.v12.protocol.discovery.get_resources_edges_response import (
+    GetResourcesEdgesResponse,
+)
+from etptypes.energistics.etp.v12.protocol.discovery.get_resources_response import (
+    GetResourcesResponse,
+)
+from etptypes.energistics.etp.v12.datatypes.object.resource import Resource
+from etptypes.energistics.etp.v12.datatypes.object.active_status_kind import (
+    ActiveStatusKind,
+)
+from etptypes.energistics.etp.v12.datatypes.object.deleted_resource import (
+    DeletedResource,
+)
+
+# =========================== DISCOVERY QUERY PROTOCOL
+from etptypes.energistics.etp.v12.protocol.discovery_query.find_resources_response import (
+    FindResourcesResponse,
+)
+from etptypes.energistics.etp.v12.protocol.discovery_query.find_resources import (
+    FindResources,
+)
+# =========================== GROWING OBJECT PROTOCOL
+from etptypes.energistics.etp.v12.protocol.growing_object_query.find_parts import (
+    FindParts,
+)
+from etptypes.energistics.etp.v12.protocol.growing_object_query.find_parts_response import (
+    FindPartsResponse,
+)
+
+# =========================== STORE QUERY PROTOCOL
+from etptypes.energistics.etp.v12.protocol.store_query.find_data_objects import (
+    FindDataObjects,
+)
+from etptypes.energistics.etp.v12.protocol.store_query.find_data_objects_response import (
+    FindDataObjectsResponse,
+)
+from etptypes.energistics.etp.v12.datatypes.object.data_object import DataObject
+
 # ===========================
 
 from etpproto.client_info import ClientInfo
@@ -86,6 +134,10 @@ from etpproto.messages import Message
 from etpproto.protocols.core import CoreHandler
 from etpproto.protocols.store import StoreHandler
 from etpproto.protocols.dataspace import DataspaceHandler
+from etpproto.protocols.discovery import DiscoveryHandler
+from etpproto.protocols.discovery_query import DiscoveryQueryHandler
+from etpproto.protocols.growing_object_query import GrowingObjectQueryHandler
+from etpproto.protocols.store_query import StoreQueryHandler
 
 #    ______                                    __                   __
 #   / ____/___  ________     ____  _________  / /_____  _________  / /
@@ -314,5 +366,173 @@ class myDataArrayProtocol(DataArrayHandler):
             PutUninitializedDataArraysResponse(success={
                 k: True
                 for k, v in msg.data_arrays.items()}), 
+            correlation_id=msg_header.message_id,
+        )
+
+#     ____  _
+#    / __ \(_)_____________ _   _____  _______  __
+#   / / / / / ___/ ___/ __ \ | / / _ \/ ___/ / / /
+#  / /_/ / (__  ) /__/ /_/ / |/ /  __/ /  / /_/ /
+# /_____/_/____/\___/\____/|___/\___/_/   \__, /
+#                                        /____/
+
+@ETPConnection.on(CommunicationProtocol.DISCOVERY)
+class MyDiscoveryHandler(DiscoveryHandler):
+    async def on_get_deleted_resources(
+        self,
+        msg: GetDeletedResources,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            GetDeletedResourcesResponse(deleted_resources=[
+                DeletedResource(
+                    uri = "eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                    deleted_time = 0),
+                DeletedResource(
+                    uri = "eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                    deleted_time = 0)
+                ]), 
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_get_resources(
+        self,
+        msg: GetResources,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            GetResourcesResponse(resources=[
+                    Resource(
+                        uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                        name="Test Name 0",
+                        source_count=0,
+                        target_count=0,
+                        last_changed=0,
+                        store_last_write=0,
+                        store_created=0,
+                        active_status=ActiveStatusKind.ACTIVE,
+                    ),
+                    Resource(
+                        uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                        name="Test Name 0",
+                        source_count=0,
+                        target_count=0,
+                        last_changed=0,
+                        store_last_write=0,
+                        store_created=0,
+                        active_status=ActiveStatusKind.ACTIVE,
+                    )
+                ]
+                ), 
+            correlation_id=msg_header.message_id,
+        )
+
+#     ____  _                                      ____
+#    / __ \(_)_____________ _   _____  _______  __/ __ \__  _____  _______  __
+#   / / / / / ___/ ___/ __ \ | / / _ \/ ___/ / / / / / / / / / _ \/ ___/ / / /
+#  / /_/ / (__  ) /__/ /_/ / |/ /  __/ /  / /_/ / /_/ / /_/ /  __/ /  / /_/ /
+# /_____/_/____/\___/\____/|___/\___/_/   \__, /\___\_\__,_/\___/_/   \__, /
+#                                        /____/                      /____/
+
+@ETPConnection.on(CommunicationProtocol.DISCOVERY_QUERY)
+class MyDiscoveryQueryHandler(DiscoveryQueryHandler):
+    async def on_find_resources(
+        self,
+        msg: FindResources,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            FindResourcesResponse(
+                    server_sort_order="",
+                    resources=[
+                        Resource(
+                            uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                            name="Test Name 0",
+                            source_count=0,
+                            target_count=0,
+                            last_changed=0,
+                            store_last_write=0,
+                            store_created=0,
+                            active_status=ActiveStatusKind.ACTIVE,
+                        ),
+                        Resource(
+                            uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                            name="Test Name 0",
+                            source_count=0,
+                            target_count=0,
+                            last_changed=0,
+                            store_last_write=0,
+                            store_created=0,
+                            active_status=ActiveStatusKind.ACTIVE,
+                        )
+                    ],
+                ), 
+            correlation_id=msg_header.message_id,
+        )
+
+#    ______                   _             ____  __      _           __  ____
+#   / ____/________ _      __(_)___  ____ _/ __ \/ /_    (_)__  _____/ /_/ __ \__  _____  _______  __
+#  / / __/ ___/ __ \ | /| / / / __ \/ __ `/ / / / __ \  / / _ \/ ___/ __/ / / / / / / _ \/ ___/ / / /
+# / /_/ / /  / /_/ / |/ |/ / / / / / /_/ / /_/ / /_/ / / /  __/ /__/ /_/ /_/ / /_/ /  __/ /  / /_/ /
+# \____/_/   \____/|__/|__/_/_/ /_/\__, /\____/_.___/_/ /\___/\___/\__/\___\_\__,_/\___/_/   \__, /
+#                                 /____/           /___/                                    /____/
+
+@ETPConnection.on(CommunicationProtocol.GROWING_OBJECT_QUERY)
+class MyGrowingObjectQueryHandler(GrowingObjectQueryHandler):
+    async def on_find_parts(
+        self,
+        msg: FindParts,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            FindPartsResponse(
+                    uri=msg.uri,
+                    server_sort_order="",
+                    format_=msg.format_,
+                    parts=[],
+                ), 
+            correlation_id=msg_header.message_id,
+        )
+
+#    _____ __                  ____
+#   / ___// /_____  ________  / __ \__  _____  _______  __
+#   \__ \/ __/ __ \/ ___/ _ \/ / / / / / / _ \/ ___/ / / /
+#  ___/ / /_/ /_/ / /  /  __/ /_/ / /_/ /  __/ /  / /_/ /
+# /____/\__/\____/_/   \___/\___\_\__,_/\___/_/   \__, /
+#                                                /____/
+
+@ETPConnection.on(CommunicationProtocol.STORE_QUERY)
+class MyStoreQueryHandler(StoreQueryHandler):
+    async def on_find_data_objects(
+        self,
+        msg: FindDataObjects,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield Message.get_object_message(
+            FindDataObjectsResponse(
+                    server_sort_order="",
+                    data_objects=[
+                            DataObject(
+                                resource=Resource(
+                                            uri="eml:///witsml20.ChannelSet(2c0f6ef2-cc54-4104-8523-0f0fbaba3661)",
+                                            name="Test Name 0",
+                                            source_count=0,
+                                            target_count=0,
+                                            last_changed=0,
+                                            store_last_write=0,
+                                            store_created=0,
+                                            active_status=ActiveStatusKind.ACTIVE,
+                                        ),
+                                blob_id=None,
+                                format_="xml",
+                                data=""
+                            ),
+                    ],
+                ), 
             correlation_id=msg_header.message_id,
         )

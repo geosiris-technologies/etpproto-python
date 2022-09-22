@@ -22,6 +22,17 @@ from etptypes.energistics.etp.v12.datatypes.data_array_types.data_array_metadata
 from etptypes.energistics.etp.v12.datatypes.data_array_types.data_array import (
     DataArray,
 )
+from etptypes.energistics.etp.v12.datatypes.object.context_info import ContextInfo
+
+from etptypes.energistics.etp.v12.datatypes.object.context_scope_kind import (
+    ContextScopeKind,
+)
+from etptypes.energistics.etp.v12.datatypes.object.relationship_kind import (
+    RelationshipKind,
+)
+from etptypes.energistics.etp.v12.protocol.discovery_query.find_resources import (
+    FindResources,
+)
 
 try:
     from .server_protocol_example import *
@@ -316,3 +327,169 @@ async def test_on_put_uninitialized_data_arrays() -> None:
     assert len(answer[0].body.success) == 2
     assert list(answer[0].body.success.keys())[0] == "a"
     assert list(answer[0].body.success.keys())[1] == "b"
+
+#     ____  _
+#    / __ \(_)_____________ _   _____  _______  __
+#   / / / / / ___/ ___/ __ \ | / / _ \/ ___/ / / /
+#  / /_/ / (__  ) /__/ /_/ / |/ /  __/ /  / /_/ /
+# /_____/_/____/\___/\____/|___/\___/_/   \__, /
+#                                        /____/
+
+@pytest.mark.asyncio
+async def test_on_get_deleted_resources():
+    connection = ETPConnection()
+    connection.is_connected = True
+
+    get_data_arrays = Message.get_object_message(GetDeletedResources(
+                                                dataspace_uri="eml:///dataspace(my-dataspace)",
+                                                delete_time_filter=1,
+                                                data_object_types=["ChannelSet"]
+                                                ), msg_id=1,)
+
+    answer = []
+    async for m in (
+        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    ):
+        answer.append(
+            Message.decode_binary_message(
+                m, ETPConnection.generic_transition_table
+            )
+        )
+
+    assert len(answer) == 1
+    assert isinstance(answer[0].body, GetDeletedResourcesResponse)
+    assert len(answer[0].body.deleted_resources) == 2
+
+
+@pytest.mark.asyncio
+async def test_on_get_resources():
+    connection = ETPConnection()
+    connection.is_connected = True
+
+    get_data_arrays = Message.get_object_message(GetResources(
+                                            context=ContextInfo(
+                                                uri="eml:///",
+                                                depth=3,
+                                                navigable_edges=RelationshipKind.BOTH,
+                                            ),
+                                            scope=ContextScopeKind.TARGETS,
+                                        ), msg_id=1,)
+
+    answer = []
+    async for m in (
+        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    ):
+        answer.append(
+            Message.decode_binary_message(
+                m, ETPConnection.generic_transition_table
+            )
+        )
+
+    assert len(answer) == 1
+    assert isinstance(answer[0].body, GetResourcesResponse)
+    assert len(answer[0].body.resources) == 2
+
+#     ____  _                                      ____
+#    / __ \(_)_____________ _   _____  _______  __/ __ \__  _____  _______  __
+#   / / / / / ___/ ___/ __ \ | / / _ \/ ___/ / / / / / / / / / _ \/ ___/ / / /
+#  / /_/ / (__  ) /__/ /_/ / |/ /  __/ /  / /_/ / /_/ / /_/ /  __/ /  / /_/ /
+# /_____/_/____/\___/\____/|___/\___/_/   \__, /\___\_\__,_/\___/_/   \__, /
+#                                        /____/                      /____/
+
+@pytest.mark.asyncio
+async def test_on_find_resources():
+    connection = ETPConnection()
+    connection.is_connected = True
+
+    get_data_arrays = Message.get_object_message(FindResources(
+                                            context=ContextInfo(
+                                                uri="eml:///",
+                                                depth=3,
+                                                navigable_edges=RelationshipKind.BOTH,
+                                            ),
+                                            scope=ContextScopeKind.TARGETS,
+                                        ), msg_id=1,)
+
+    answer = []
+    async for m in (
+        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    ):
+        answer.append(
+            Message.decode_binary_message(
+                m, ETPConnection.generic_transition_table
+            )
+        )
+
+    assert len(answer) == 1
+    assert isinstance(answer[0].body, FindResourcesResponse)
+    assert len(answer[0].body.resources) == 2
+
+
+#    ______                   _             ____  __      _           __  ____
+#   / ____/________ _      __(_)___  ____ _/ __ \/ /_    (_)__  _____/ /_/ __ \__  _____  _______  __
+#  / / __/ ___/ __ \ | /| / / / __ \/ __ `/ / / / __ \  / / _ \/ ___/ __/ / / / / / / _ \/ ___/ / / /
+# / /_/ / /  / /_/ / |/ |/ / / / / / /_/ / /_/ / /_/ / / /  __/ /__/ /_/ /_/ / /_/ /  __/ /  / /_/ /
+# \____/_/   \____/|__/|__/_/_/ /_/\__, /\____/_.___/_/ /\___/\___/\__/\___\_\__,_/\___/_/   \__, /
+#                                 /____/           /___/                                    /____/
+
+@pytest.mark.asyncio
+async def test_on_find_parts():
+    connection = ETPConnection()
+    connection.is_connected = True
+
+    get_data_arrays = Message.get_object_message(FindParts(
+                                            uri="eml:///resqmlv2.TriangulatedSetRepresentation(260690d5-adc3-4f2c-b53e-2ff16345f52f)",
+                                            format_="xml",
+                                        ), msg_id=1,)
+
+    answer = []
+    async for m in (
+        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    ):
+        answer.append(
+            Message.decode_binary_message(
+                m, ETPConnection.generic_transition_table
+            )
+        )
+
+    assert len(answer) == 1
+    assert isinstance(answer[0].body, FindPartsResponse)
+    assert answer[0].body.uri == "eml:///resqmlv2.TriangulatedSetRepresentation(260690d5-adc3-4f2c-b53e-2ff16345f52f)"
+    assert answer[0].body.format_ == "xml"
+
+
+#    _____ __                  ____
+#   / ___// /_____  ________  / __ \__  _____  _______  __
+#   \__ \/ __/ __ \/ ___/ _ \/ / / / / / / _ \/ ___/ / / /
+#  ___/ / /_/ /_/ / /  /  __/ /_/ / /_/ /  __/ /  / /_/ /
+# /____/\__/\____/_/   \___/\___\_\__,_/\___/_/   \__, /
+#                                                /____/
+
+@pytest.mark.asyncio
+async def test_on_find_data_objects():
+    connection = ETPConnection()
+    connection.is_connected = True
+
+    get_data_arrays = Message.get_object_message(FindDataObjects(
+                                            context=ContextInfo(
+                                                uri="eml:///",
+                                                depth=3,
+                                                navigable_edges=RelationshipKind.BOTH,
+                                            ),
+                                            scope=ContextScopeKind.TARGETS,
+                                        ), msg_id=1,)
+
+    answer = []
+    async for m in (
+        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    ):
+        answer.append(
+            Message.decode_binary_message(
+                m, ETPConnection.generic_transition_table
+            )
+        )
+
+    assert len(answer) == 1
+    assert isinstance(answer[0].body, FindDataObjectsResponse)
+    assert len(answer[0].body.data_objects) == 1
+    assert answer[0].body.data_objects[0].format_ == "xml"
