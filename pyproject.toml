@@ -63,7 +63,7 @@ exclude = '''
 '''
 
 [tool.pytest.ini_options]
-addopts = "-v --cache-clear -rf --cov=etpproto/ --cov-report=term --cov-report=html --junitxml=pytest.xml"
+addopts = ""
 console_output_style = "count"
 python_classes = "Test"
 python_files = "test_*.py"
