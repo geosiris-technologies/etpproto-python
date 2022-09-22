@@ -1,6 +1,6 @@
 ---
 
-name: Publish release Test
+on: [push,pull_request]
 
 on:
   push:
