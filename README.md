@@ -58,8 +58,19 @@ simply run
 ```
 to have pre-commit install the new version.
 
-To bump a new version of the project simply run: 
+To bump a new version of the project simply publish a release name 'vX.X.X' with X replaced by your numbers
+
+Test
+----------
+
+Run tests with poetry
 ```console
-    poetry version [patch, minor, major]
+poetry run pytest -v --cache-clear -rf --cov=etpproto/ --cov-report=term --cov-report=html --maxfail=10
 ```
-You must choose between the semver rules [patch, minor, major]
+
+Test the code validity : 
+```console
+poetry run black .
+poetry run flake8 .
+poetry run mypy etpproto
+```

@@ -389,14 +389,20 @@ class Message(ABC):
                 )
 
                 print(
+                    "HEADER", recMH, flush=True
+                )
+
+                print(
                     "classmethod decode_binary_message", object_res, flush=True
                 )
+                print(" ==> object_class ", object_class)
 
                 return Message(
                     mh.MessageHeader.parse_obj(recMH),
                     object_class.parse_obj(object_res),
                 )
-            except Exception:
+            except Exception as e:
+                print(e)
                 # error, now we try to read it as an error, because error has now the protocol of the message send by the clien
                 # try:
                 object_class = dict_map_pro_to_class["0"][
@@ -484,34 +490,6 @@ def decode_binary_message(
         mh.MessageHeader.parse_obj(recMH),
         object_class.parse_obj(object_res),
     )
-
-
-# Ecrit un message complet a partir d'un objet ETP dans un BytesIO
-# Retourne le nouveau msg_id
-def write_etp_message(
-    bio: BytesIO,
-    msg_id: int,
-    etp_object: ETPModel,
-    message_flags: int = 0,
-) -> int:
-    header_schema = json.loads(avro_schema(mh.MessageHeader))
-    objSchema = json.loads(avro_schema(type(etp_object)))
-
-    header = mh.MessageHeader(
-        protocol=int(objSchema["protocol"]),
-        messageType=int(objSchema["messageType"]),
-        correlationId=0,
-        messageId=msg_id,
-        messageFlags=message_flags,
-    )
-
-    objectDict = etp_object.dict(by_alias=True)
-
-    print("write_etp_message", objectDict, flush=True)
-
-    schemaless_writer(bio, header_schema, header.dict(by_alias=True))
-    schemaless_writer(bio, objSchema, objectDict)
-    return msg_id + 1
 
 
 # When calling thins function we are supposed to have only one entry in the data_objects map/list
