@@ -1,5 +1,7 @@
 from typing import Any, ClassVar, Dict, Union
 
+from dataclasses import dataclass, field
+
 from etptypes.energistics.etp.v12.protocol.core.open_session import OpenSession
 from etptypes.energistics.etp.v12.protocol.core.request_session import (
     RequestSession,
@@ -8,25 +10,22 @@ from etptypes.energistics.etp.v12.protocol.core.request_session import (
 from etpproto.endpoint_capability_kind import kind_from_name
 
 
+@dataclass
 class ClientInfo:
     count_instance: ClassVar[int] = 0
 
-    endpoint_capabilities: Dict[str, Any] = {}
-
-    def __init__(
-        self,
-        ip: str = "0.0.0.0",
-        login: str = "anonymousUser",
-        endpoint_capabilities: Dict[str, Any] = {
+    endpoint_capabilities: Dict[str, Any] = field(
+        default_factory=lambda: {
             "MaxWebSocketFramePayloadSize": 10000,
             "MaxWebSocketMessagePayloadSize": 10000,
-        },
-    ):
+        }
+    )
+    login: str = field(default="anonymousUser")
+    ip: str = field(default="0.0.0.0")
+
+    def __post_init__(self):
         self._id = self.count_instance
         ClientInfo.count_instance = ClientInfo.count_instance + 1
-        self.ip = ip
-        self.login = login
-        self.endpoint_capabilities = endpoint_capabilities
 
     def getCapability(self, name: str) -> Any:
         if name in self.endpoint_capabilities:
@@ -52,6 +51,7 @@ class ClientInfo:
                     val = max(val, cap_class._min)
                 if cap_class._max is not None:
                     val = min(val, cap_class._max)
+
             self.endpoint_capabilities[k] = val
 
         print("Negotiated capa : ", self.endpoint_capabilities)

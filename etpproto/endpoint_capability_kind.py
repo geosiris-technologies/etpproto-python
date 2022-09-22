@@ -234,7 +234,7 @@ class SupportsAlternateRequestUris(EndpointCapabilityKind):
 
     _default = False
     _unit = None
-    value: Optional[int] = field(default=False)
+    value: Optional[bool] = field(default=False)
 
 
 @dataclass
@@ -245,7 +245,7 @@ class SupportsMessageHeaderExtensions(EndpointCapabilityKind):
 
     _default = False
     _unit = None
-    value: Optional[int] = field(default=False)
+    value: Optional[bool] = field(default=False)
 
 
 def kind_from_name(classname):

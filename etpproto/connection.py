@@ -141,13 +141,13 @@ class ETPConnection:
     # \____/\__,_/\___/_/ /_/\___/  / .___/\____/\__,_/_/     /_/\___/____/   \____/_/ /_/\__,_/_/ /_/_/|_/____/  /_/ /_/ /_/\___/____/____/\__,_/\__, /\___/
     #                              /_/                                                                                                           /____/
 
-    chunk_msg_cache: ClassVar[dict] = field(
-        default={}
-    )  #: Dict[int, Message] = field(default_factory={})
+    chunk_msg_cache: Dict[int, List[Message]] = field(
+        default_factory=lambda: {}
+    )
 
-    error_msg_cache: ClassVar[dict] = field(
-        default={}
-    )  #: Dict[int, List[Optional[Message]]] = field(default_factory={})
+    error_msg_cache: Dict[int, List[Optional[Message]]] = field(
+        default_factory=lambda: {}
+    )
 
     client_info: ClientInfo = field(default=ClientInfo())
 

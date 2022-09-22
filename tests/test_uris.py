@@ -64,3 +64,16 @@ def test_raw_uri() -> None:
     uri = parse_uri("a_random_str")
     assert isinstance(uri, Uri)
     assert uri.raw_uri == "a_random_str"
+
+
+def test_find_uuid() -> None:
+    assert (
+        find_uuid(
+            "eml:///dataspace('rdms-db')/resqml20.obj_HorizonInterpretation(uuid=421a7a05-033a-450d-bcef-051352023578,version='2.0')"
+        )
+        == "421a7a05-033a-450d-bcef-051352023578"
+    )
+    assert (
+        find_uuid("my test TExt421a7a05-033a-450d-bcef-051352023578aa)")
+        == "421a7a05-033a-450d-bcef-051352023578"
+    )

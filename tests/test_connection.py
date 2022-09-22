@@ -242,6 +242,27 @@ async def test_connection_state_close_session() -> None:
 
 
 @pytest.mark.asyncio
+async def test_connection_state_2_distincts() -> None:
+    connection_a = ETPConnection()
+    connection_b = ETPConnection()
+
+    assert not connection_a.is_connected
+    assert not connection_b.is_connected
+
+    async for m in connection_a._handle_message_generator(requestSession_msg):
+        pass
+
+    assert connection_a.is_connected
+    assert not connection_b.is_connected
+
+    async for m in connection_a._handle_message_generator(closeSession_msg):
+        pass
+
+    assert not connection_a.is_connected
+    assert not connection_b.is_connected
+
+
+@pytest.mark.asyncio
 async def test_connection_state_request_session_as_bytes() -> None:
     connection = ETPConnection()
 

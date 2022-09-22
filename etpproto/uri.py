@@ -76,7 +76,7 @@ class DataObjectURI(Uri):
         return re.match(CANONICAL_DATA_OBJECT_URIS, uri) is not None
 
 
-def findUuid(input: str) -> Optional[str]:
+def find_uuid(input: str) -> Optional[str]:
     p = re.compile(UUID_REGEX)
     result = p.search(input)
     if result is not None:

@@ -41,6 +41,7 @@ from etpproto.error import (
     ETPError,
     InvalidMessageError,
     UnsupportedProtocolError,
+    MaxSizeExceededError,
 )
 from etpproto.messages import Message, MessageFlags
 
@@ -194,6 +195,21 @@ async def test_msg_multiparity():
     assert requestSession_msg.is_multipart_msg()
     requestSession_msg.remove_header_flag(MessageFlags.MULTIPART)
     assert not requestSession_msg.is_multipart_msg()
+
+
+@pytest.mark.asyncio
+async def test_msg_simple_msg_exceed_size():
+    size_limit = 20
+    connection_client = ETPConnection(connection_type=ConnectionType.CLIENT)
+
+    async for result in requestSession_msg.encode_message_generator(
+        size_limit, connection_client
+    ):
+        decoded = Message.decode_binary_message(
+            result, ETPConnection.generic_transition_table
+        )
+        assert isinstance(decoded.body, ProtocolException)
+        assert decoded.body.error.code == MaxSizeExceededError.code
 
 
 @pytest.mark.asyncio

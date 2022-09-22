@@ -41,3 +41,7 @@ dask-worker-space
 # Example for local test
 example/
 utils/
+
+# Other files
+requirements.txt
+doc/
