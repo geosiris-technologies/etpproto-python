@@ -16,11 +16,10 @@ maintainers = [
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/bp/resqpy"
-homepage = "www.geosiris.com"
+homepage = "http://www.geosiris.com"
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3.9",
-    "License :: OSI Approved :: Apache Software License"
+    "License :: OSI Approved :: Apache Software License",
 ]
 keywords = ["ETP"]
 
