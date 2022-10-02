@@ -25,7 +25,7 @@ jobs:
       # See https://github.com/marketplace/actions/lint-action
       - name: Run linters (with annotations)
         if: github.event.pull_request.head.repo.full_name == github.repository
-        uses: wearerequired/lint-action@v1
+        uses: wearerequired/lint-action@v2
         with:
           flake8: true
           flake8_command_prefix: poetry run
