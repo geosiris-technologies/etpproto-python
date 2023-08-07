@@ -26,9 +26,9 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python",
     "Topic :: Internet :: WWW/HTTP",
     "Topic :: Internet",
@@ -41,7 +41,7 @@ classifiers = [
 keywords = ["ETP"]
 
 [tool.poetry.dependencies]
-python = "^3.9,<3.11"
+python = "^3.9"
 fastavro = "^1.6.1"
 coverage = {extras = ["toml"], version = "^6.2"}
 etptypes = "^1.0.1"
