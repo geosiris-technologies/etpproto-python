@@ -391,11 +391,9 @@ class Message(ABC):
                     return_record_name_override=True,
                 )
 
-                logging.debug("HEADER", recMH, flush=True)
+                logging.debug("HEADER", recMH)
 
-                logging.debug(
-                    "classmethod decode_binary_message", object_res, flush=True
-                )
+                logging.debug("classmethod decode_binary_message", object_res)
                 logging.debug(" ==> object_class ", object_class)
 
                 return Message(
@@ -442,8 +440,8 @@ class Message(ABC):
         message_flags: int = 0,
     ) -> Optional[Message]:
         if etp_object:
-            logging.debug("get_object_message", etp_object, flush=True)
-            logging.debug("get_object_message", type(etp_object), flush=True)
+            logging.debug("get_object_message", etp_object)
+            logging.debug("get_object_message", type(etp_object))
 
             objSchema = json.loads(avro_schema(type(etp_object)))
 
@@ -484,7 +482,7 @@ def decode_binary_message(
         return_record_name_override=True,
     )
 
-    logging.debug("decode_binary_message", object_res, flush=True)
+    logging.debug("decode_binary_message", object_res)
 
     return (
         mh.MessageHeader.parse_obj(recMH),
