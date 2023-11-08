@@ -58,7 +58,6 @@ class DataObjectURI(Uri):
         super(DataObjectURI, self).__init__(uri)
         p = re.compile(CANONICAL_DATA_OBJECT_URIS)
         result = p.search(uri)
-        # print("res : ", result)
         if result is not None:
             self.dataspace = result.group("dataspace")
             self.domain = result.group("domain")
@@ -92,9 +91,8 @@ def parse_uri(uri: str) -> Union[DataObjectURI, DataspaceUri, Uri]:
     try:
         return DataObjectURI(uri)
     except AttributeError:  # si un [..].group ne marche pas
-        # print(e1)
         try:
             return DataspaceUri(uri)
         except AttributeError:
-            # print(e2)
+            # logging.error(e2)
             return Uri(uri)

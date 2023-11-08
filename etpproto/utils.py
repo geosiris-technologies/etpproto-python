@@ -13,17 +13,11 @@ from etptypes import ETPModel, avro_schema
 
 
 def list_classes(modulePath: str) -> List[Type[ETPModel]]:
-    # print("==> " + modulePath)
     module = importlib.import_module(modulePath)
     classList = []
     for _, obj in inspect.getmembers(module):
-        # print("_> " + str(name))
         if inspect.isclass(obj):
-            # print(str(name))
             classList.append(obj)
-        # if inspect.ismodule(obj):
-        # print("--> " + str(obj))
-        # classList += listClasses(name)
     return classList
 
 

@@ -1,7 +1,8 @@
 # Copyright (c) 2022-2023 Geosiris.
 # SPDX-License-Identifier: Apache-2.0
-
 from __future__ import annotations
+
+import logging
 
 from dataclasses import dataclass, field
 from enum import Enum
@@ -211,7 +212,9 @@ class ETPConnection:
                 if self.is_connected and isinstance(
                     etp_input_msg.body, CloseSession
                 ):
-                    # print(self.client_info.ip, ": CloseSession recieved")
+                    logging.debug(
+                        self.client_info.ip, ": CloseSession recieved"
+                    )
                     self.is_connected = False
                 else:
                     # Test if it is an Open/Request session
@@ -225,7 +228,7 @@ class ETPConnection:
                         self.is_connected = True
                         self.client_info.negotiate(etp_input_msg.body)
 
-                    # print(etp_input_msg, etp_input_msg.is_chunk_msg(), etp_input_msg.is_chunk_msg_referencer())
+                    # logging.debug(etp_input_msg, etp_input_msg.is_chunk_msg(), etp_input_msg.is_chunk_msg_referencer())
                     # On test si c'est un message de BLOB qu'il faut mettre en cache :
                     if etp_input_msg.is_multipart_msg() and (
                         etp_input_msg.is_chunk_msg()
@@ -242,7 +245,7 @@ class ETPConnection:
 
                         # si final on rassemble et on handle.
                         if etp_input_msg.is_final_msg():
-                            print(
+                            logging.debug(
                                 "Reassemble chunks : ",
                                 self.chunk_msg_cache[cache_id],
                             )
@@ -267,7 +270,7 @@ class ETPConnection:
                                         )
 
                             except Exception as e:
-                                print(
+                                logging.error(
                                     self.client_info.ip,
                                     ": _SERVER_ not handled exception",
                                 )
@@ -292,10 +295,8 @@ class ETPConnection:
                                 )
                                 in self.transition_table
                             ):
-
                                 # demande la reponse au protocols du serveur
                                 try:
-
                                     async for handled in self.transition_table[
                                         CommunicationProtocol(
                                             etp_input_msg.header.protocol
@@ -317,7 +318,7 @@ class ETPConnection:
                                     )
 
                             else:
-                                print(
+                                logging.debug(
                                     self.client_info.ip
                                     + " : #handle_msg : unkown protocol id : "
                                     + str(etp_input_msg.header.protocol)
@@ -326,7 +327,7 @@ class ETPConnection:
                                     etp_input_msg.header.protocol
                                 )
                         except ETPError as etp_err:
-                            print(
+                            logging.error(
                                 self.client_info.ip,
                                 ": _SERVER_ internal error : " + str(etp_err),
                             )
@@ -339,7 +340,7 @@ class ETPConnection:
                                 request_msg_id=current_msg_id,
                             )
                         except Exception as e:
-                            print(
+                            logging.error(
                                 self.client_info.ip,
                                 ": _SERVER_ not handled exception",
                             )
@@ -356,7 +357,6 @@ class ETPConnection:
     async def send_msg_and_error_generator(
         self, msg: Message, err_msg: Message
     ) -> AsyncGenerator[Tuple[int, bytes], None]:
-
         current_msg_id = self.consume_msg_id()
 
         if msg:
@@ -385,7 +385,7 @@ class ETPConnection:
                     yield (current_msg_id, msg_part)
 
         elif err_msg:
-            # print(self.client_info.ip, ": Encoding error")
+            # logging.debug(self.client_info.ip, ": Encoding error")
             async for msg_part in err_msg.encode_message_generator(
                 self.client_info.getCapability(
                     "MaxWebSocketMessagePayloadSize"
@@ -404,8 +404,8 @@ class ETPConnection:
         etp_input_msg = Message.decode_binary_message(
             msg_data, ETPConnection.generic_transition_table
         )
-        # print("### MSG ", etp_input_msg)
-        # return None
+        logging.debug("### MSG ", etp_input_msg)
+
         async for msg in self._handle_message_generator(etp_input_msg):
             if msg is not None:
                 async for msg_part in msg.encode_message_generator(

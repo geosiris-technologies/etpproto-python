@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import logging
+
 import json
 import re
 import traceback
@@ -62,7 +64,6 @@ class MessageFlags(
 
 @dataclass
 class Message(ABC):
-
     header: mh.MessageHeader
     body: ETPModel
 
@@ -162,7 +163,7 @@ class Message(ABC):
 
                         if isinstance(values, dict):  # on a bien un dict
                             # splitting dict in 2 parts
-                            for (k, v) in values.items():
+                            for k, v in values.items():
                                 if len(d0) < len(values) / 2:
                                     d0[k] = v
                                 else:
@@ -301,7 +302,6 @@ class Message(ABC):
     def reassemble_chunk(
         cls, multipart_msg: List[Message]
     ) -> Optional[Message]:
-
         referencer: Optional[Message] = None
 
         # on rassemble tout dans un seul msg (concat de toutes les map)
@@ -355,7 +355,7 @@ class Message(ABC):
                 for k, do in do_collection.items():
                     inner_operate_data_object(do)
             else:
-                print(
+                logging.error(
                     "#etpproto.message@reassemble_chunk : not supported chunckable message data_objects type : ",
                     type(do_collection),
                 )
@@ -382,7 +382,7 @@ class Message(ABC):
                     str(recMH["messageType"])
                 ]
 
-                # print("##> len : ", len(binary), " posAfterHeaderRead ", posAfterHeaderRead, " fotell", fo.tell())
+                # logging.debug("##> len : ", len(binary), " posAfterHeaderRead ", posAfterHeaderRead, " fotell", fo.tell())
 
                 object_res = schemaless_reader(
                     fo,
@@ -391,26 +391,26 @@ class Message(ABC):
                     return_record_name_override=True,
                 )
 
-                print("HEADER", recMH, flush=True)
+                logging.debug("HEADER", recMH, flush=True)
 
-                print(
+                logging.debug(
                     "classmethod decode_binary_message", object_res, flush=True
                 )
-                print(" ==> object_class ", object_class)
+                logging.debug(" ==> object_class ", object_class)
 
                 return Message(
                     mh.MessageHeader.parse_obj(recMH),
                     object_class.parse_obj(object_res),
                 )
             except Exception as e:
-                print(e)
-                # error, now we try to read it as an error, because error has now the protocol of the message send by the clien
+                logging.error(e)
+                # error, now we try to read it as an error, because error has now the protocol of the message send by the client
                 # try:
                 object_class = dict_map_pro_to_class["0"][
                     str(recMH["messageType"])
                 ]
 
-                print(" ==> object_class ", object_class)
+                logging.debug(" ==> object_class ", object_class)
 
                 object_res = schemaless_reader(
                     fo,
@@ -424,8 +424,8 @@ class Message(ABC):
                 )
                 # except Exception:
                 #     traceback.print_exc()
-                #     print("### ERR : in decode_binary_message")
-                #     print(e)
+                #     logging.error("### ERR : in decode_binary_message")
+                #     logging.error(e)
                 #     pass
 
         # If the message has not been read, it's should be a partial message
@@ -442,9 +442,8 @@ class Message(ABC):
         message_flags: int = 0,
     ) -> Optional[Message]:
         if etp_object:
-
-            # print("get_object_message", etp_object, flush=True)
-            # print("get_object_message", type(etp_object), flush=True)
+            logging.debug("get_object_message", etp_object, flush=True)
+            logging.debug("get_object_message", type(etp_object), flush=True)
 
             objSchema = json.loads(avro_schema(type(etp_object)))
 
@@ -485,7 +484,7 @@ def decode_binary_message(
         return_record_name_override=True,
     )
 
-    print("decode_binary_message", object_res, flush=True)
+    logging.debug("decode_binary_message", object_res, flush=True)
 
     return (
         mh.MessageHeader.parse_obj(recMH),
@@ -500,7 +499,6 @@ async def _encode_message_generator_chunk(
     max_bytes_per_msg: int,
     connection,
 ) -> AsyncGenerator[bytes, None]:
-
     from etpproto.error import InternalError
 
     secure_size = 50  # TODO : ameliorer pour que le chunk fasse vraiment la taille max d'un message (il faudrait connaitre la taille de ce qui n'est pas binaire dans le chunk message)
@@ -521,7 +519,9 @@ async def _encode_message_generator_chunk(
         nb_chunks = ceil(
             encoded_msg_size / size_of_chunks
         )  # substract 50 for header part (header takes 5?) and non binary part of the chunk message
-        # print("Size of chunks : ", size_of_chunks, " msgS ", encoded_msg_size)
+        logging.debug(
+            "Size of chunks : ", size_of_chunks, " msgS ", encoded_msg_size
+        )
         # get the chunks class
         chunk_class = get_class_from_protocol_and_name(
             str(chunkable_msg.header.protocol),
@@ -530,14 +530,13 @@ async def _encode_message_generator_chunk(
         )
 
         if chunk_class is not None:
-
             lst_chunks = []  # all chunks of all dataObjects
 
             # for blob_id see 3.7.3.2 of the documentation :
             # blob_id is assign to one entire DataObject and is refered in all chunck of this dataObject
 
             if isinstance(data_objs, dict):
-                for (k, do) in data_objs.items():
+                for k, do in data_objs.items():
                     data = do.data
                     blob_id = Uuid(pyUUID.uuid4().bytes)
 
@@ -559,7 +558,6 @@ async def _encode_message_generator_chunk(
                     do.blob_id = blob_id
                     do.data = b""  # removing the data from the message when blob_id is populated
             elif isinstance(data_objs, list):
-
                 # on parcourt la liste des DataObjects
                 # on cree plusieurs chunk pour chacuns
                 for do in data_objs:
@@ -567,7 +565,7 @@ async def _encode_message_generator_chunk(
                     blob_id = Uuid(pyUUID.uuid4().bytes)
 
                     # nb_chunks = ceil(len(data)/size_of_chunks)
-                    # print("Nb chunks : ", nb_chunks)
+                    logging.debug("Nb chunks : ", nb_chunks)
                     for c_i in range(nb_chunks):
                         # create chunk msg
                         chunk_msg = chunk_class(

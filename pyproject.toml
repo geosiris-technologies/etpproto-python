@@ -7,7 +7,8 @@ name = "etpproto"
 version = "0.0.0" # Set at build time
 description = "ETP protocol implementation"
 authors = [
-    "Lionel Untereiner <lionel.untereiner@geosiris.com>"
+    "Lionel Untereiner <lionel.untereiner@geosiris.com>", 
+    "Valentin Gauthier <valentin.gauthier@geosiris.com>"
 ]
 maintainers = [
     "Lionel Untereiner <lionel.untereiner@geosiris.com>", 

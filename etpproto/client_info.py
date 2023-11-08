@@ -1,5 +1,6 @@
 # Copyright (c) 2022-2023 Geosiris.
 # SPDX-License-Identifier: Apache-2.0
+import logging
 
 from typing import Any, ClassVar, Dict, Union
 
@@ -47,7 +48,7 @@ class ClientInfo:
                 try:
                     val = min(val, self.endpoint_capabilities[k])
                 except Exception as e1:
-                    print(e1)
+                    logging.debug(e1)
 
             if cap_class is not None:
                 if cap_class._min is not None:
@@ -57,9 +58,9 @@ class ClientInfo:
 
             self.endpoint_capabilities[k] = val
 
-        print("Negotiated capa : ", self.endpoint_capabilities)
+        logging.debug("Negotiated capa : ", self.endpoint_capabilities)
         # else:
-        # print("No capability found for name '" + k + "'")
+        # logging.debug("No capability found for name '" + k + "'")
 
     def __str__(self) -> str:
         return (
