@@ -356,8 +356,7 @@ class Message(ABC):
                     inner_operate_data_object(do)
             else:
                 logging.error(
-                    "#etpproto.message@reassemble_chunk : not supported chunckable message data_objects type : ",
-                    type(do_collection),
+                    f"#etpproto.message@reassemble_chunk : not supported chunckable message data_objects type : {type(do_collection)}"
                 )
             result = referencer
 
@@ -382,7 +381,7 @@ class Message(ABC):
                     str(recMH["messageType"])
                 ]
 
-                # logging.debug("##> len : ", len(binary), " posAfterHeaderRead ", posAfterHeaderRead, " fotell", fo.tell())
+                # logging.debug("##> len : {len(binary)} posAfterHeaderRead {posAfterHeaderRead} fotell {fo.tell()}")
 
                 object_res = schemaless_reader(
                     fo,
@@ -391,24 +390,26 @@ class Message(ABC):
                     return_record_name_override=True,
                 )
 
-                logging.debug("HEADER", recMH)
+                logging.debug(f"HEADER {recMH}")
 
-                logging.debug("classmethod decode_binary_message", object_res)
-                logging.debug(" ==> object_class ", object_class)
+                logging.debug(
+                    f"classmethod decode_binary_message {object_res}"
+                )
+                logging.debug(f" ==> object_class {object_class}")
 
                 return Message(
                     mh.MessageHeader.parse_obj(recMH),
                     object_class.parse_obj(object_res),
                 )
             except Exception as e:
-                logging.error(e)
+                logging.error(f"{e}")
                 # error, now we try to read it as an error, because error has now the protocol of the message send by the client
                 # try:
                 object_class = dict_map_pro_to_class["0"][
                     str(recMH["messageType"])
                 ]
 
-                logging.debug(" ==> object_class ", object_class)
+                logging.debug(f" ==> object_class {object_class}")
 
                 object_res = schemaless_reader(
                     fo,
@@ -423,7 +424,7 @@ class Message(ABC):
                 # except Exception:
                 #     traceback.print_exc()
                 #     logging.error("### ERR : in decode_binary_message")
-                #     logging.error(e)
+                #     logging.error(f"{e}")
                 #     pass
 
         # If the message has not been read, it's should be a partial message
@@ -440,8 +441,8 @@ class Message(ABC):
         message_flags: int = 0,
     ) -> Optional[Message]:
         if etp_object:
-            logging.debug("get_object_message", etp_object)
-            logging.debug("get_object_message", type(etp_object))
+            logging.debug(f"get_object_message {etp_object}")
+            logging.debug(f"get_object_message {type(etp_object)}")
 
             objSchema = json.loads(avro_schema(type(etp_object)))
 
@@ -482,7 +483,7 @@ def decode_binary_message(
         return_record_name_override=True,
     )
 
-    logging.debug("decode_binary_message", object_res)
+    logging.debug(f"decode_binary_message {object_res}")
 
     return (
         mh.MessageHeader.parse_obj(recMH),
@@ -518,7 +519,7 @@ async def _encode_message_generator_chunk(
             encoded_msg_size / size_of_chunks
         )  # substract 50 for header part (header takes 5?) and non binary part of the chunk message
         logging.debug(
-            "Size of chunks : ", size_of_chunks, " msgS ", encoded_msg_size
+            f"Size of chunks : {size_of_chunks} msgS {encoded_msg_size}"
         )
         # get the chunks class
         chunk_class = get_class_from_protocol_and_name(
@@ -563,7 +564,7 @@ async def _encode_message_generator_chunk(
                     blob_id = Uuid(pyUUID.uuid4().bytes)
 
                     # nb_chunks = ceil(len(data)/size_of_chunks)
-                    logging.debug("Nb chunks : ", nb_chunks)
+                    logging.debug(f"Nb chunks : {nb_chunks}")
                     for c_i in range(nb_chunks):
                         # create chunk msg
                         chunk_msg = chunk_class(

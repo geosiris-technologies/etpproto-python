@@ -213,7 +213,7 @@ class ETPConnection:
                     etp_input_msg.body, CloseSession
                 ):
                     logging.debug(
-                        self.client_info.ip, ": CloseSession recieved"
+                        f"{self.client_info.ip} : CloseSession recieved"
                     )
                     self.is_connected = False
                 else:
@@ -246,8 +246,7 @@ class ETPConnection:
                         # si final on rassemble et on handle.
                         if etp_input_msg.is_final_msg():
                             logging.debug(
-                                "Reassemble chunks : ",
-                                self.chunk_msg_cache[cache_id],
+                                f"Reassemble chunks :{self.chunk_msg_cache[cache_id]}",
                             )
                             try:
                                 async for msg in self._handle_message_generator(
@@ -271,8 +270,7 @@ class ETPConnection:
 
                             except Exception as e:
                                 logging.error(
-                                    self.client_info.ip,
-                                    ": _SERVER_ not handled exception",
+                                    f"{self.client_info.ip}: _SERVER_ not handled exception",
                                 )
                                 raise e
 
@@ -319,17 +317,14 @@ class ETPConnection:
 
                             else:
                                 logging.debug(
-                                    self.client_info.ip
-                                    + " : #handle_msg : unkown protocol id : "
-                                    + str(etp_input_msg.header.protocol)
+                                    f"{self.client_info.ip} : #handle_msg : unkown protocol id : {str(etp_input_msg.header.protocol)}"
                                 )
                                 raise UnsupportedProtocolError(
                                     etp_input_msg.header.protocol
                                 )
                         except ETPError as etp_err:
                             logging.error(
-                                self.client_info.ip,
-                                ": _SERVER_ internal error : " + str(etp_err),
+                                f"{self.client_info.ip}: _SERVER_ internal error : {etp_err}"
                             )
                             yield self._handle_answer_and_error(
                                 msg=etp_err.to_etp_message(
@@ -341,8 +336,7 @@ class ETPConnection:
                             )
                         except Exception as e:
                             logging.error(
-                                self.client_info.ip,
-                                ": _SERVER_ not handled exception",
+                                f"{self.client_info.ip}: _SERVER_ not handled exception",
                             )
                             raise e
             else:  # not connected
@@ -385,7 +379,7 @@ class ETPConnection:
                     yield (current_msg_id, msg_part)
 
         elif err_msg:
-            # logging.debug(self.client_info.ip, ": Encoding error")
+            # logging.debug(f"{self.client_info.ip} : Encoding error")
             async for msg_part in err_msg.encode_message_generator(
                 self.client_info.getCapability(
                     "MaxWebSocketMessagePayloadSize"
@@ -404,7 +398,7 @@ class ETPConnection:
         etp_input_msg = Message.decode_binary_message(
             msg_data, ETPConnection.generic_transition_table
         )
-        logging.debug("### MSG ", etp_input_msg)
+        logging.debug(f"### MSG {etp_input_msg}")
 
         async for msg in self._handle_message_generator(etp_input_msg):
             if msg is not None:
