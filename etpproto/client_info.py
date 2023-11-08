@@ -58,9 +58,9 @@ class ClientInfo:
 
             self.endpoint_capabilities[k] = val
 
-        logging.debug("Negotiated capa : ", self.endpoint_capabilities)
+        logging.debug(f"Negotiated capa : {self.endpoint_capabilities}")
         # else:
-        # logging.debug("No capability found for name '" + k + "'")
+        # logging.debug(f"No capability found for name '{k}'")
 
     def __str__(self) -> str:
         return (
