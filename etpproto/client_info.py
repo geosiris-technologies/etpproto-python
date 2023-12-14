@@ -26,6 +26,7 @@ class ClientInfo:
     )
     login: str = field(default="anonymousUser")
     ip: str = field(default="0.0.0.0")
+    authenticated: bool = field(default=False)
 
     def __post_init__(self):
         self._id = self.count_instance
