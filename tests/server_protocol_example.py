@@ -4,6 +4,7 @@
 import uuid
 from datetime import datetime
 from typing import AsyncGenerator, Optional, Union
+import base64
 
 from etptypes.energistics.etp.v12.datatypes.contact import Contact
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
@@ -28,8 +29,9 @@ from etptypes.energistics.etp.v12.protocol.core.pong import Pong
 from etptypes.energistics.etp.v12.protocol.core.request_session import (
     RequestSession,
 )
-from etptypes.energistics.etp.v12.protocol.store.get_data_objects_response import (
-    GetDataObjectsResponse,
+from etptypes.energistics.etp.v12.protocol.core.authorize import Authorize
+from etptypes.energistics.etp.v12.protocol.core.authorize_response import (
+    AuthorizeResponse,
 )
 
 # =========================== DATASPACE PROTOCOL
@@ -53,6 +55,11 @@ from etptypes.energistics.etp.v12.protocol.dataspace.delete_dataspaces import (
 )
 from etptypes.energistics.etp.v12.protocol.dataspace.delete_dataspaces_response import (
     DeleteDataspacesResponse,
+)
+
+
+from etptypes.energistics.etp.v12.protocol.store.get_data_objects_response import (
+    GetDataObjectsResponse,
 )
 
 # =========================== DATA_ARRAY PROTOCOL
@@ -294,6 +301,48 @@ class myCoreProtocol(CoreHandler):
         client_info: Union[None, ClientInfo],
     ) -> AsyncGenerator[Optional[Message], None]:
         print("#Core : Pong recieved")
+
+    async def on_authorize(
+        self,
+        msg: Authorize,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        username = "usernameTest"
+        password = "passwordTest"
+        success = False
+        try:
+            scheme, credentials = msg.authorization.split()
+            dec_username = None
+            dec_password = None
+            if scheme.lower() == "basic":
+                decoded = base64.b64decode(credentials).decode("ascii")
+                dec_username, _, dec_password = decoded.partition(":")
+            success = dec_username == username and dec_password == password
+        except Exception:
+            pass
+        yield Message.get_object_message(
+            AuthorizeResponse(success=success, challenges=[]),
+            correlation_id=msg_header.message_id,
+        )
+
+    async def on_authorize_response(
+        self,
+        msg: AuthorizeResponse,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_open_session(
+        self,
+        msg: OpenSession,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        yield None
 
 
 @ETPConnection.on(CommunicationProtocol.STORE)

@@ -38,6 +38,7 @@ from etpproto.error import (
     ETPError,
     InvalidMessageError,
     UnsupportedProtocolError,
+    InvalidStateError,
 )
 from etpproto.protocols.discovery import GetResources
 
@@ -218,6 +219,7 @@ async def test_connection_state_open_session_client() -> None:
     print(openSession_msg.body.dict(by_alias=True))
     async for m in connection._handle_message_generator(openSession_msg):
         # print(m)
+        assert m is None
         pass
 
     assert connection.is_connected
@@ -397,7 +399,7 @@ async def test_send_msg_without_connection_generator() -> None:
 
     assert len(answer) == 1
     assert isinstance(answer[0].body, ProtocolException)
-    assert answer[0].body.error.code == InvalidMessageError.code
+    assert answer[0].body.error.code == InvalidStateError.code
 
 
 @pytest.mark.asyncio

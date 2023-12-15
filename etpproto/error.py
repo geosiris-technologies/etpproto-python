@@ -302,7 +302,7 @@ class UpdateGrowingObjectDeniedError(ETPError):
 
 class BackPressureLimitExceededError(ETPError):
     """
-    Indicates the sender has detected the receiver is not processing messages as fast as it can send them and exceeding its capacity in its outgoing buffers.  If sender capacity is exhausted and it is eas
+    Indicates the sender has detected the receiver is not processing messages as fast as it can send them and exceeding its capacity in its outgoing buffers. If sender capacity is exhausted and it is eas
     """
 
     code: ClassVar[int] = 24
@@ -320,6 +320,90 @@ class BackPressureWarningError(ETPError):
 
     def __init__(self) -> None:
         super().__init__("Back Pressure Warning.")
+
+
+class TimedOut(ETPError):
+    """
+    May be sent by either role to cancel an operation when the response time for a relevant operation is exceeded, such as ResponseTimeoutPeriod or MultipartMessageTimeoutPeriod capabilities.
+    """
+
+    code: ClassVar[int] = 26
+
+    def __init__(self) -> None:
+        super().__init__("Response timeout")
+
+
+class AuthorizationRequired(ETPError):
+    """
+    Sent from an endpoint during session negotiation (and ONLY during session negotiation) to indicate that the other endpoint requires authorization.
+    """
+
+    code: ClassVar[int] = 27
+
+    def __init__(self) -> None:
+        super().__init__("Authorization required.")
+
+
+class AuthorizationExpiring(ETPError):
+    """
+        Optionally sent from an endpoint when the other endpoint's authorization will expire soon. The receiving endpoint should follow the necessary authorization workflow to renew its authorization. If it does not, the sending endpoint will eventually terminate the connection.
+    The precise definition of "soon" and the required re-authorization workflow are intentionally out of the scope of the ETP Specification.
+    """
+
+    code: ClassVar[int] = 28
+
+    def __init__(self) -> None:
+        super().__init__("Authorization expiring.")
+
+
+class NoSupportedDataObjectTypes(ETPError):
+    """
+    The server does not support any of the client's supported data object types.
+    """
+
+    code: ClassVar[int] = 29
+
+    def __init__(self) -> None:
+        super().__init__(
+            "The server does not support any of the client's supported data object types."
+        )
+
+
+class ResponseCountExceeded(ETPError):
+    """
+    Sent by a store endpoint to terminate a non-map response once the number of responses sent has reached the allowed or stated limits specified by the relevant capabilities. This lets customers know that the store has more data than it could return to the customer. EXAMPLES:
+        - In Protocol 3 (Discovery) and all query protocols, sent by the store if it must stop sending responses to the customer because it has already sent MaxResponseCount responses to a customer request.
+        - In Protocol 21 (ChannelSubscribe), sent by the store if it must stop sending data points to a customer in response to a GetRanges request because the store has already sent MaxRangeDataItemCount data points in response to the request.
+    """
+
+    code: ClassVar[int] = 30
+
+    def __init__(self) -> None:
+        super().__init__("Response count exceeded.")
+
+
+class InvalidAppend(ETPError):
+    """
+    Sent in response to a ChannelData message that is not appending data to a channel.
+    """
+
+    code: ClassVar[int] = 31
+
+    def __init__(self) -> None:
+        super().__init__(
+            "Sent in response to a ChannelData message that is not appending data to a channel."
+        )
+
+
+class InvalidOperation(ETPError):
+    """
+    Sent in response to a request when the requested operation would be invalid. EXAMPLE: In Protocol 6 (GrowingObject), a ReplacePartsByRange message where some replacement parts are not covered by the delete range is an invalid operation.
+    """
+
+    code: ClassVar[int] = 32
+
+    def __init__(self) -> None:
+        super().__init__("Invalid operation.")
 
 
 class InvalidChannelIDError(ETPError):
