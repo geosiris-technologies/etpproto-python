@@ -3,11 +3,9 @@
 
 from __future__ import annotations
 
-import logging
-
 import json
+import logging
 import re
-import traceback
 import uuid as pyUUID
 from abc import ABC
 from copy import deepcopy
@@ -55,7 +53,7 @@ class MessageFlags(
     # The message body is compressed.
     COMPRESSED = 0x8
 
-    # An Acknowledge message is requested by the sender.
+    # An Acknowledgment message is requested by the sender.
     ACKNOWLEDGE = 0x10
 
     # The message has a header extension.
@@ -74,8 +72,8 @@ class Message(ABC):
             schemaless_writer(
                 bio, header_schema, self.header.dict(by_alias=True)
             )
-        objSchema = json.loads(avro_schema(type(self.body)))
-        schemaless_writer(bio, objSchema, self.body.dict(by_alias=True))
+        obj_schema = json.loads(avro_schema(type(self.body)))
+        schemaless_writer(bio, obj_schema, self.body.dict(by_alias=True))
 
         value = bio.getvalue()
 
@@ -85,7 +83,8 @@ class Message(ABC):
     #   Si le message depasse la taille max :
     #       - Si c'est un "Plural Message" (see. 3.7.3 de la documention etp v1.1)
     #           > Si oui on essaie de decouper la map en plusieurs messages
-    #               +++> Verifier si le nb de clefs ne depassent pas le MaxResponseCount, sinon on envoie un ERESPONSECOUNT_EXCEEDED (see 3.7.3.1)
+    #               +++> Verifier si le nb de clefs ne depassent pas le MaxResponseCount,
+    #                       sinon on envoie un ERESPONSECOUNT_EXCEEDED (see 3.7.3.1)
     #           > Sinon si contient un BLOB, on essaie de le couper en plusieurs messages
     #           > Sinon on envoie un message d'erreur
     #       - Sinon, on si contient un BLOB, on essaie de le couper en plusieurs messages
@@ -117,17 +116,14 @@ class Message(ABC):
 
         # Body encoding
         out_body = BytesIO()
-        objSchema = json.loads(avro_schema(type(self.body)))
-        schemaless_writer(out_body, objSchema, self.body.dict(by_alias=True))
+        obj_schema = json.loads(avro_schema(type(self.body)))
+        schemaless_writer(out_body, obj_schema, self.body.dict(by_alias=True))
 
         # Size computation
-        headerSize = int(out_h0.getbuffer().nbytes)
-        bodySize = int(out_body.getbuffer().nbytes)
+        header_size = int(out_h0.getbuffer().nbytes)
+        body_size = int(out_body.getbuffer().nbytes)
         try:
-            if (
-                max_bytes_per_msg > 0
-                and headerSize + bodySize > max_bytes_per_msg
-            ):
+            if 0 < max_bytes_per_msg < header_size + body_size:
                 # Message exceed the max_bytes_per_msg
                 if self.is_plural_msg():
                     msg1 = deepcopy(self)
@@ -201,7 +197,7 @@ class Message(ABC):
                         ):
                             async for part in _encode_message_generator_chunk(
                                 chunkable_msg=self,
-                                encoded_msg_size=bodySize,
+                                encoded_msg_size=body_size,
                                 max_bytes_per_msg=max_bytes_per_msg,
                                 connection=connection,
                             ):
@@ -259,7 +255,7 @@ class Message(ABC):
         self.header.message_flags = self.header.message_flags | msg_flag
 
     def remove_header_flag(self, msg_flag: MessageFlags) -> None:
-        self.header.message_flags = self.header.message_flags & ~(msg_flag)
+        self.header.message_flags = self.header.message_flags & ~msg_flag
 
     def is_plural_msg(self):
         if self.body:
@@ -444,13 +440,12 @@ class Message(ABC):
             logging.debug(f"get_object_message {etp_object}")
             logging.debug(f"get_object_message {type(etp_object)}")
 
-            objSchema = json.loads(avro_schema(type(etp_object)))
+            obj_schema = json.loads(avro_schema(type(etp_object)))
 
-            header = None
             if has_header:
                 header = mh.MessageHeader(
-                    protocol=int(objSchema["protocol"]),
-                    messageType=int(objSchema["messageType"]),
+                    protocol=int(obj_schema["protocol"]),
+                    messageType=int(obj_schema["messageType"]),
                     correlationId=correlation_id,
                     messageId=msg_id,
                     messageFlags=message_flags,
