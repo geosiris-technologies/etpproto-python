@@ -198,9 +198,7 @@ class ETPConnection:
         if (
             etp_input_msg is not None and etp_input_msg.header is not None
         ):  # si pas un message none
-            
             current_msg_id = etp_input_msg.header.message_id
-
             if not self.auth_required or (
                 self.client_info is not None
                 and (
@@ -218,7 +216,6 @@ class ETPConnection:
                     == CommunicationProtocol.CORE.value
                     or self.is_connected
                 ):
-
                     # if requires acknowledge :
                     if (
                         etp_input_msg.is_asking_acknowledge()
