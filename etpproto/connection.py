@@ -370,12 +370,11 @@ class ETPConnection:
                 else:  # not connected
                     yield InvalidStateError().to_etp_message(
                         msg_id=self.consume_msg_id(),
-                        correlation_id=current_msg_id
+                        correlation_id=current_msg_id,
                     )
             else:  # not authenticated
                 yield AuthorizationRequired().to_etp_message(
-                    msg_id=self.consume_msg_id(),
-                    correlation_id=current_msg_id
+                    msg_id=self.consume_msg_id(), correlation_id=current_msg_id
                 )
         else:  # null message
             yield InvalidMessageError().to_etp_message(

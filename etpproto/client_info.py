@@ -61,7 +61,9 @@ class ClientInfo:
                 self.endpoint_capabilities[k] = val
             except Exception as e:
                 logging.error(e)
-                logging.error(f"{str(self)}: @clientinfo.negotiate Error with {k}, {v}")
+                logging.error(
+                    f"{str(self)}: @clientinfo.negotiate Error with {k}, {v}"
+                )
 
         logging.debug(f"Negotiated capa : {self.endpoint_capabilities}")
         # else:
