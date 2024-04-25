@@ -39,25 +39,28 @@ class ClientInfo:
 
     def negotiate(self, msg: Union[OpenSession, RequestSession]):
         for k, v in msg.endpoint_capabilities.items():
-            cap_class = kind_from_name(k)
-            # if cap_class != None:
-            val: Any = v
-            if hasattr(val, "item"):
-                val = v.item  # if it is a DataValue
+            try:
+                cap_class = kind_from_name(k)
+                # if cap_class != None:
+                val: Any = v
+                if hasattr(val, "item"):
+                    val = v.item  # if it is a DataValue
 
-            if k in self.endpoint_capabilities:
-                try:
-                    val = min(val, self.endpoint_capabilities[k])
-                except Exception as e1:
-                    logging.debug(e1)
+                if k in self.endpoint_capabilities:
+                    try:
+                        val = min(val, self.endpoint_capabilities[k])
+                    except Exception as e1:
+                        logging.debug(e1)
 
-            if cap_class is not None:
-                if cap_class._min is not None:
-                    val = max(val, cap_class._min)
-                if cap_class._max is not None:
-                    val = min(val, cap_class._max)
+                if cap_class is not None:
+                    if cap_class._min is not None:
+                        val = max(val, cap_class._min)
+                    if cap_class._max is not None:
+                        val = min(val, cap_class._max)
 
-            self.endpoint_capabilities[k] = val
+                self.endpoint_capabilities[k] = val
+            except Exception as e:
+                logging.error(f"{str(self)}: @clientinfo.negotiate Error with {k}, {v}")
 
         logging.debug(f"Negotiated capa : {self.endpoint_capabilities}")
         # else:

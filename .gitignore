@@ -3,6 +3,7 @@
 .vscode
 *.sublime-project
 *.sublime-workspace
+*.iml
 
 # Checkpoints
 .ipynb_checkpoints
