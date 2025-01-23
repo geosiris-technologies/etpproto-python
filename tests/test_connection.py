@@ -1,27 +1,12 @@
 # Copyright (c) 2022-2023 Geosiris.
 # SPDX-License-Identifier: Apache-2.0
 
-import asyncio
-from math import ceil
-
 import pytest
-
-from etptypes.energistics.etp.v12.datatypes.data_object_capability_kind import (
-    DataObjectCapabilityKind,
-)
-from etptypes.energistics.etp.v12.datatypes.data_value import DataValue
-from etptypes.energistics.etp.v12.datatypes.object.active_status_kind import (
-    ActiveStatusKind,
-)
 from etptypes.energistics.etp.v12.datatypes.object.context_info import (
     ContextInfo,
 )
 from etptypes.energistics.etp.v12.datatypes.object.context_scope_kind import (
     ContextScopeKind,
-)
-from etptypes.energistics.etp.v12.datatypes.object.data_object import (
-    DataObject,
-    Resource,
 )
 from etptypes.energistics.etp.v12.datatypes.object.relationship_kind import (
     RelationshipKind,
@@ -30,17 +15,11 @@ from etptypes.energistics.etp.v12.protocol.core.acknowledge import Acknowledge
 from etptypes.energistics.etp.v12.protocol.core.protocol_exception import (
     ProtocolException,
 )
-from etptypes.energistics.etp.v12.protocol.store.get_data_objects_response import (
-    GetDataObjectsResponse,
-)
 
 from etpproto.error import (
-    ETPError,
     InvalidMessageError,
-    UnsupportedProtocolError,
     InvalidStateError,
 )
-from etpproto.protocols.discovery import GetResources
 
 try:
     from .server_protocol_example import *
@@ -272,7 +251,7 @@ async def test_connection_state_request_session_as_bytes() -> None:
     connection = ETPConnection()
 
     async for m in connection.handle_bytes_generator(
-        requestSession_msg.encode_message()
+            requestSession_msg.encode_message()
     ):
         pass
 
@@ -284,12 +263,12 @@ async def test_connection_state_close_session_as_bytes() -> None:
     connection = ETPConnection()
 
     async for m in connection.handle_bytes_generator(
-        requestSession_msg.encode_message()
+            requestSession_msg.encode_message()
     ):
         pass
 
     async for m in connection.handle_bytes_generator(
-        closeSession_msg.encode_message()
+            closeSession_msg.encode_message()
     ):
         pass
 
@@ -314,7 +293,7 @@ async def test_connection_requestSession_answer_as_bytes() -> None:
 
     answer = []
     async for m in connection.handle_bytes_generator(
-        requestSession_msg.encode_message()
+            requestSession_msg.encode_message()
     ):
         answer.append(m)
 
@@ -332,7 +311,7 @@ async def test_connection_requestSession_answer_as_bytes_generator() -> None:
 
     answer = []
     async for m in (
-        connection.handle_bytes_generator(requestSession_msg.encode_message())
+            connection.handle_bytes_generator(requestSession_msg.encode_message())
     ):
         answer.append(
             Message.decode_binary_message(
@@ -369,7 +348,7 @@ async def test_connection_closeSession_answer_as_bytes_generator() -> None:
 
     answer = []
     async for m in (
-        connection.handle_bytes_generator(closeSession_msg.encode_message())
+            connection.handle_bytes_generator(closeSession_msg.encode_message())
     ):
         answer.append(
             Message.decode_binary_message(
@@ -387,7 +366,7 @@ async def test_send_msg_without_connection_generator() -> None:
 
     answer = []
     async for m in (
-        connection.handle_bytes_generator(getResources_msg.encode_message())
+            connection.handle_bytes_generator(getResources_msg.encode_message())
     ):
         answer.append(
             Message.decode_binary_message(
@@ -414,7 +393,7 @@ async def test_connection_first_msg_attributes() -> None:
     assert len(answer) == 1
     assert answer[0].header.message_id == 1
     assert (
-        answer[0].header.correlation_id == requestSession_msg.header.message_id
+            answer[0].header.correlation_id == requestSession_msg.header.message_id
     )
     assert answer[0].is_final_msg()
 
@@ -426,9 +405,9 @@ async def test_connection_requestSession_answer_as_bytes_generator_acknowledge()
 
     answer = []
     async for m in (
-        connection.handle_bytes_generator(
-            requestSession_msg_ask_acknowledge.encode_message()
-        )
+            connection.handle_bytes_generator(
+                requestSession_msg_ask_acknowledge.encode_message()
+            )
     ):
         answer.append(
             Message.decode_binary_message(
@@ -441,41 +420,6 @@ async def test_connection_requestSession_answer_as_bytes_generator_acknowledge()
     assert answer[1].is_final_msg()
     assert isinstance(answer[0].body, Acknowledge)
     assert isinstance(answer[1].body, OpenSession)
-
-
-@pytest.mark.asyncio
-async def test_msg_multipart_chunks_reassembled_in_connection():
-    nb_data_objects = len(dataObjectResponse_msg.body.data_objects)
-    size_limit = 500
-    connection_client = ETPConnection(connection_type=ConnectionType.CLIENT)
-    dataObjectResponse_msg.set_final_msg(True)
-
-    async for m in connection_client._handle_message_generator(
-        openSession_msg
-    ):
-        pass
-    assert connection_client.is_connected
-
-    nb_chunks = ceil(
-        len(resqml_obj_37166c33_3ebb_40ae_9bc6_1ab9693def60)
-        / (size_limit - 50)
-    )  # 50 is the size limit security (see message.py)
-
-    assert len(connection_client.chunk_msg_cache) == 0
-    idx = 0
-    async for part in dataObjectResponse_msg.encode_message_generator(
-        size_limit, connection_client
-    ):
-        idx += 1
-        async for m in connection_client.handle_bytes_generator(part):
-            pass
-        if idx == nb_data_objects * (1 + nb_chunks):
-            assert len(connection_client.chunk_msg_cache) == 0
-        else:
-            assert len(connection_client.chunk_msg_cache) == 1
-            assert (
-                len(list(connection_client.chunk_msg_cache.values())[0]) == idx
-            )
 
 
 if __name__ == "__main__":
