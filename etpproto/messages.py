@@ -364,8 +364,8 @@ class Message(ABC):
     ) -> Optional[Message]:
         fo = BytesIO(binary)
         recMH = schemaless_reader(
-            fo,
-            json.loads(mh.avro_schema),
+            fo=fo,
+            writer_schema=json.loads(mh.avro_schema),
             return_record_name=True,
             return_record_name_override=True,
         )
@@ -464,22 +464,23 @@ def decode_binary_message(
 ) -> Tuple[mh.MessageHeader, ETPModel]:
     fo = BytesIO(binary)
     recMH = schemaless_reader(
-        fo,
-        json.loads(mh.avro_schema),
+        fo=fo,
+        writer_schema=json.loads(mh.avro_schema),
         return_record_name=True,
         return_record_name_override=True,
     )
-    object_class = dict_map_pro_to_class[str(recMH["protocol"])][
+    assert isinstance(recMH, dict)
+    object_class = dict_map_pro_to_class[str(recMH.get("protocol", -1))][
         str(recMH["messageType"])
     ]
     object_res = schemaless_reader(
-        fo,
-        json.loads(avro_schema(object_class)),
+        fo=fo,
+        writer_schema=json.loads(avro_schema(object_class)),
         return_record_name=True,
         return_record_name_override=True,
     )
 
-    logging.debug(f"decode_binary_message {object_res}")
+    logging.debug("decode_binary_message %s", object_res)
 
     return (
         mh.MessageHeader.parse_obj(recMH),
