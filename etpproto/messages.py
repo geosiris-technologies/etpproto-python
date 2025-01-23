@@ -370,6 +370,7 @@ class Message(ABC):
             return_record_name_override=True,
         )
         posAfterHeaderRead = fo.tell()
+
         assert isinstance(recMH, dict)
         if recMH.get("protocol", -1) >= 0:
             try:
