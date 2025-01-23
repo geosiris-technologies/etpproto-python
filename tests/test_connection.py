@@ -310,8 +310,8 @@ async def test_connection_requestSession_answer_as_bytes_generator() -> None:
     connection = ETPConnection()
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(requestSession_msg.encode_message())
+    async for m in connection.handle_bytes_generator(
+        requestSession_msg.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -347,8 +347,8 @@ async def test_connection_closeSession_answer_as_bytes_generator() -> None:
         pass
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(closeSession_msg.encode_message())
+    async for m in connection.handle_bytes_generator(
+        closeSession_msg.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -365,8 +365,8 @@ async def test_send_msg_without_connection_generator() -> None:
     connection = ETPConnection()
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(getResources_msg.encode_message())
+    async for m in connection.handle_bytes_generator(
+        getResources_msg.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -399,15 +399,15 @@ async def test_connection_first_msg_attributes() -> None:
 
 
 @pytest.mark.asyncio
-async def test_connection_requestSession_answer_as_bytes_generator_acknowledge() -> None:
+async def test_connection_requestSession_answer_as_bytes_generator_acknowledge() -> (
+    None
+):
     connection = ETPConnection()
     assert requestSession_msg_ask_acknowledge.is_asking_acknowledge()
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(
-            requestSession_msg_ask_acknowledge.encode_message()
-        )
+    async for m in connection.handle_bytes_generator(
+        requestSession_msg_ask_acknowledge.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(

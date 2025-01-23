@@ -212,9 +212,11 @@ class Message(ABC):
         except ETPError as err:
             msg_err = err.to_etp_message(
                 msg_id=connection.consume_msg_id(),
-                correlation_id=self.header.correlation_id
-                if self.header.correlation_id != 0
-                else 0,
+                correlation_id=(
+                    self.header.correlation_id
+                    if self.header.correlation_id != 0
+                    else 0
+                ),
             )
             if msg_err is not None:
                 msg_err.set_final_msg(True)
@@ -598,7 +600,9 @@ async def _encode_message_generator_chunk(
                     message_flags=MessageFlags.MULTIPART,
                 )
                 if current_chunk_msg is not None:
-                    async for part in current_chunk_msg.encode_message_generator(
+                    async for (
+                        part
+                    ) in current_chunk_msg.encode_message_generator(
                         max_bytes_per_msg, connection
                     ):
                         yield part
@@ -614,9 +618,11 @@ async def _encode_message_generator_chunk(
                 msg_id=connection.consume_msg_id(),
                 has_header=True,
                 correlation_id=correlation_id,
-                message_flags=MessageFlags.MULTIPART_AND_FINALPART
-                if msg_was_final
-                else MessageFlags.MULTIPART,
+                message_flags=(
+                    MessageFlags.MULTIPART_AND_FINALPART
+                    if msg_was_final
+                    else MessageFlags.MULTIPART
+                ),
             )
             if final_chunk_msg is not None:
                 async for part in final_chunk_msg.encode_message_generator(

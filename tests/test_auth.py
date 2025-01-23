@@ -72,8 +72,8 @@ async def test_connection_authorize_msg_response() -> None:
         msg_id=1,
     )
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(auth_msg.encode_message())
+    async for m in connection.handle_bytes_generator(
+        auth_msg.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -100,8 +100,8 @@ async def test_connection_authorize_msg_basic_correct() -> None:
         msg_id=1,
     )
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(auth_msg.encode_message())
+    async for m in connection.handle_bytes_generator(
+        auth_msg.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -127,8 +127,8 @@ async def test_connection_authorize_msg_basic_wrong_username() -> None:
         msg_id=1,
     )
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(auth_msg.encode_message())
+    async for m in connection.handle_bytes_generator(
+        auth_msg.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -154,8 +154,8 @@ async def test_connection_authorize_msg_basic_wrong_password() -> None:
         msg_id=1,
     )
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(auth_msg.encode_message())
+    async for m in connection.handle_bytes_generator(
+        auth_msg.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -172,8 +172,8 @@ async def test_connection_not_auth_error() -> None:
     connection = ETPConnection(auth_required=True)
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(requestSession_msg.encode_message())
+    async for m in connection.handle_bytes_generator(
+        requestSession_msg.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
