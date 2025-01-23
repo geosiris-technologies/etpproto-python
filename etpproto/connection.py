@@ -132,9 +132,9 @@ class ETPConnection:
 
     SUB_PROTOCOL: Final[str] = "etp12.energistics.org"
 
-    generic_transition_table: ClassVar[
-        ProtocolDict
-    ] = get_all_etp_protocol_classes()
+    generic_transition_table: ClassVar[ProtocolDict] = (
+        get_all_etp_protocol_classes()
+    )
 
     transition_table: ClassVar[Dict[CommunicationProtocol, Protocol]] = {}
 
@@ -272,7 +272,9 @@ class ETPConnection:
                                     f"Reassemble chunks :{self.chunk_msg_cache[cache_id]}",
                                 )
                                 try:
-                                    async for msg in self._handle_message_generator(
+                                    async for (
+                                        msg
+                                    ) in self._handle_message_generator(
                                         Message.reassemble_chunk(
                                             self.chunk_msg_cache[cache_id]
                                         )
@@ -324,7 +326,9 @@ class ETPConnection:
                                 ):
                                     # demande la reponse au protocols du serveur
                                     try:
-                                        async for handled in self.transition_table[
+                                        async for (
+                                            handled
+                                        ) in self.transition_table[
                                             CommunicationProtocol(
                                                 etp_input_msg.header.protocol
                                             )

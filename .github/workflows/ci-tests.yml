@@ -24,29 +24,28 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: Install Python dependencies
+        run: pip install black flake8
+
       # Post in-line comments for any issues found
       # Do not run if coming from a forked repo
       # See https://github.com/marketplace/actions/lint-action
       - name: Run linters (with annotations)
-        if: github.event.pull_request.head.repo.full_name == github.repository
+        # if: github.event.pull_request.head.repo.full_name == github.repository
         uses: wearerequired/lint-action@v2
         with:
+          auto_fix: true
+          black: true
+          black_auto_fix: true
           flake8: true
-          flake8_command_prefix: poetry run
-          flake8_dir: etpproto
-          mypy: true
-          mypy_command_prefix: poetry run
-          mypy_args: etpproto
+          flake8_auto_fix: false
 
-      # Alternative step that works with forked repo
-      - name: Run linters (without annotations)
-        if: github.event.pull_request.head.repo.full_name != github.repository
-        run: |
-          poetry run flake8 .
-          poetry run mypy etpproto
-
-      - name: Code formatting
-        run: poetry run black --check .
+#      # Alternative step that works with forked repo
+#      - name: Run linters (without annotations)
+#        # if: github.event.pull_request.head.repo.full_name != github.repository
+#        run: |
+#          poetry run flake8 .
+#          poetry run mypy etpproto
 
   unit-tests:
     name: Unit tests (Python ${{ matrix.python-version }})

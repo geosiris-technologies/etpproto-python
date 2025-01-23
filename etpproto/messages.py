@@ -212,9 +212,11 @@ class Message(ABC):
         except ETPError as err:
             msg_err = err.to_etp_message(
                 msg_id=connection.consume_msg_id(),
-                correlation_id=self.header.correlation_id
-                if self.header.correlation_id != 0
-                else 0,
+                correlation_id=(
+                    self.header.correlation_id
+                    if self.header.correlation_id != 0
+                    else 0
+                ),
             )
             if msg_err is not None:
                 msg_err.set_final_msg(True)
@@ -364,13 +366,14 @@ class Message(ABC):
     ) -> Optional[Message]:
         fo = BytesIO(binary)
         recMH = schemaless_reader(
-            fo,
-            json.loads(mh.avro_schema),
+            fo=fo,
+            writer_schema=json.loads(mh.avro_schema),
             return_record_name=True,
             return_record_name_override=True,
         )
         posAfterHeaderRead = fo.tell()
 
+        assert isinstance(recMH, dict)
         if recMH.get("protocol", -1) >= 0:
             try:
                 object_class = dict_map_pro_to_class[str(recMH["protocol"])][
@@ -386,12 +389,12 @@ class Message(ABC):
                     return_record_name_override=True,
                 )
 
-                logging.debug(f"HEADER {recMH}")
+                logging.debug("HEADER %s", recMH)
 
                 logging.debug(
-                    f"classmethod decode_binary_message {object_res}"
+                    "classmethod decode_binary_message %s", object_res
                 )
-                logging.debug(f" ==> object_class {object_class}")
+                logging.debug(" ==> object_class  %s", object_class)
 
                 return Message(
                     mh.MessageHeader.parse_obj(recMH),
@@ -463,22 +466,23 @@ def decode_binary_message(
 ) -> Tuple[mh.MessageHeader, ETPModel]:
     fo = BytesIO(binary)
     recMH = schemaless_reader(
-        fo,
-        json.loads(mh.avro_schema),
+        fo=fo,
+        writer_schema=json.loads(mh.avro_schema),
         return_record_name=True,
         return_record_name_override=True,
     )
-    object_class = dict_map_pro_to_class[str(recMH["protocol"])][
+    assert isinstance(recMH, dict)
+    object_class = dict_map_pro_to_class[str(recMH.get("protocol", -1))][
         str(recMH["messageType"])
     ]
     object_res = schemaless_reader(
-        fo,
-        json.loads(avro_schema(object_class)),
+        fo=fo,
+        writer_schema=json.loads(avro_schema(object_class)),
         return_record_name=True,
         return_record_name_override=True,
     )
 
-    logging.debug(f"decode_binary_message {object_res}")
+    logging.debug("decode_binary_message %s", object_res)
 
     return (
         mh.MessageHeader.parse_obj(recMH),
@@ -596,7 +600,9 @@ async def _encode_message_generator_chunk(
                     message_flags=MessageFlags.MULTIPART,
                 )
                 if current_chunk_msg is not None:
-                    async for part in current_chunk_msg.encode_message_generator(
+                    async for (
+                        part
+                    ) in current_chunk_msg.encode_message_generator(
                         max_bytes_per_msg, connection
                     ):
                         yield part
@@ -612,9 +618,11 @@ async def _encode_message_generator_chunk(
                 msg_id=connection.consume_msg_id(),
                 has_header=True,
                 correlation_id=correlation_id,
-                message_flags=MessageFlags.MULTIPART_AND_FINALPART
-                if msg_was_final
-                else MessageFlags.MULTIPART,
+                message_flags=(
+                    MessageFlags.MULTIPART_AND_FINALPART
+                    if msg_was_final
+                    else MessageFlags.MULTIPART
+                ),
             )
             if final_chunk_msg is not None:
                 async for part in final_chunk_msg.encode_message_generator(

@@ -64,8 +64,8 @@ async def test_get_dataspaces() -> None:
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_dataspaces.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_dataspaces.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -89,8 +89,8 @@ async def test_delete_dataspaces() -> None:
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(delete_dataspaces.encode_message())
+    async for m in connection.handle_bytes_generator(
+        delete_dataspaces.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -129,8 +129,8 @@ async def test_put_dataspaces() -> None:
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(put_dataspaces.encode_message())
+    async for m in connection.handle_bytes_generator(
+        put_dataspaces.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -173,10 +173,8 @@ async def test_on_get_data_array_metadata() -> None:
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(
-            get_data_array_metadata.encode_message()
-        )
+    async for m in connection.handle_bytes_generator(
+        get_data_array_metadata.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -211,8 +209,8 @@ async def test_on_get_data_arrays() -> None:
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -255,8 +253,8 @@ async def test_on_get_data_subarrays() -> None:
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_subarrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_subarrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -309,8 +307,8 @@ async def test_on_put_data_arrays() -> None:
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(put_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        put_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -355,8 +353,8 @@ async def test_on_put_data_subarrays() -> None:
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(put_data_subarrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        put_data_subarrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -409,10 +407,8 @@ async def test_on_put_uninitialized_data_arrays() -> None:
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(
-            put_uninitialized_data_arrays.encode_message()
-        )
+    async for m in connection.handle_bytes_generator(
+        put_uninitialized_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -450,8 +446,8 @@ async def test_on_get_deleted_resources():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -482,8 +478,8 @@ async def test_on_get_resources():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -522,8 +518,8 @@ async def test_on_find_resources():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -558,8 +554,8 @@ async def test_on_find_parts():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -602,8 +598,8 @@ async def test_on_find_data_objects():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -642,8 +638,8 @@ async def test_on_delete_parts():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -672,8 +668,8 @@ async def test_on_get_change_annotations():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -701,8 +697,8 @@ async def test_on_get_growing_data_objects_header():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -731,8 +727,8 @@ async def test_on_get_parts():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -764,8 +760,8 @@ async def test_on_get_parts_by_range():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -793,8 +789,8 @@ async def test_on_get_parts_metadata():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -850,8 +846,8 @@ async def test_on_put_growing_data_objects_header():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -880,8 +876,8 @@ async def test_on_put_parts():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
@@ -917,8 +913,8 @@ async def test_on_replace_parts_by_range():
     )
 
     answer = []
-    async for m in (
-        connection.handle_bytes_generator(get_data_arrays.encode_message())
+    async for m in connection.handle_bytes_generator(
+        get_data_arrays.encode_message()
     ):
         answer.append(
             Message.decode_binary_message(
