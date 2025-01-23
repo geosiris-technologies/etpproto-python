@@ -40,7 +40,7 @@ jobs:
 
       # Alternative step that works with forked repo
       - name: Run linters (without annotations)
-        if: github.event.pull_request.head.repo.full_name != github.repository
+        # if: github.event.pull_request.head.repo.full_name != github.repository
         run: |
           poetry run flake8 .
           poetry run mypy etpproto
