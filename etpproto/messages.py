@@ -371,7 +371,7 @@ class Message(ABC):
         )
         posAfterHeaderRead = fo.tell()
 
-        if recMH["protocol"] >= 0:
+        if recMH.get("protocol", -1) >= 0:
             try:
                 object_class = dict_map_pro_to_class[str(recMH["protocol"])][
                     str(recMH["messageType"])
