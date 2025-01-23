@@ -25,10 +25,12 @@ def test_uri_dataspace_2() -> None:
 
 
 def test_uri_dataspace_3() -> None:
-    uri = parse_uri("eml:///dataspace('volve-eqn-plus')/resqml20.obj_Grid2dRepresentation(3a45fb70-8ba9-4341-a701-0f514270ba9c)")
+    uri = parse_uri(
+        "eml:///dataspace('volve-eqn-plus')/resqml20.obj_Grid2dRepresentation(3a45fb70-8ba9-4341-a701-0f514270ba9c)"
+    )
     assert isinstance(uri, DataObjectURI)
     assert uri.dataspace is not None
-    assert uri.dataspace == 'volve-eqn-plus'
+    assert uri.dataspace == "volve-eqn-plus"
 
 
 def test_uri_data_object_0() -> None:

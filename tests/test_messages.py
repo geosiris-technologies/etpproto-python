@@ -372,8 +372,6 @@ async def test_msg_multipart_chunks_reassembled_in_connection_get_ressources():
             )
         )
 
-        
-
 
 # if __name__ == "__main__":
 #     asyncio.run(test_connection_multipart_msg_one_part_answer_generator())

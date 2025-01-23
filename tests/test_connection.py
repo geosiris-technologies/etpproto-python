@@ -251,7 +251,7 @@ async def test_connection_state_request_session_as_bytes() -> None:
     connection = ETPConnection()
 
     async for m in connection.handle_bytes_generator(
-            requestSession_msg.encode_message()
+        requestSession_msg.encode_message()
     ):
         pass
 
@@ -263,12 +263,12 @@ async def test_connection_state_close_session_as_bytes() -> None:
     connection = ETPConnection()
 
     async for m in connection.handle_bytes_generator(
-            requestSession_msg.encode_message()
+        requestSession_msg.encode_message()
     ):
         pass
 
     async for m in connection.handle_bytes_generator(
-            closeSession_msg.encode_message()
+        closeSession_msg.encode_message()
     ):
         pass
 
@@ -293,7 +293,7 @@ async def test_connection_requestSession_answer_as_bytes() -> None:
 
     answer = []
     async for m in connection.handle_bytes_generator(
-            requestSession_msg.encode_message()
+        requestSession_msg.encode_message()
     ):
         answer.append(m)
 
@@ -311,7 +311,7 @@ async def test_connection_requestSession_answer_as_bytes_generator() -> None:
 
     answer = []
     async for m in (
-            connection.handle_bytes_generator(requestSession_msg.encode_message())
+        connection.handle_bytes_generator(requestSession_msg.encode_message())
     ):
         answer.append(
             Message.decode_binary_message(
@@ -348,7 +348,7 @@ async def test_connection_closeSession_answer_as_bytes_generator() -> None:
 
     answer = []
     async for m in (
-            connection.handle_bytes_generator(closeSession_msg.encode_message())
+        connection.handle_bytes_generator(closeSession_msg.encode_message())
     ):
         answer.append(
             Message.decode_binary_message(
@@ -366,7 +366,7 @@ async def test_send_msg_without_connection_generator() -> None:
 
     answer = []
     async for m in (
-            connection.handle_bytes_generator(getResources_msg.encode_message())
+        connection.handle_bytes_generator(getResources_msg.encode_message())
     ):
         answer.append(
             Message.decode_binary_message(
@@ -393,7 +393,7 @@ async def test_connection_first_msg_attributes() -> None:
     assert len(answer) == 1
     assert answer[0].header.message_id == 1
     assert (
-            answer[0].header.correlation_id == requestSession_msg.header.message_id
+        answer[0].header.correlation_id == requestSession_msg.header.message_id
     )
     assert answer[0].is_final_msg()
 
@@ -405,9 +405,9 @@ async def test_connection_requestSession_answer_as_bytes_generator_acknowledge()
 
     answer = []
     async for m in (
-            connection.handle_bytes_generator(
-                requestSession_msg_ask_acknowledge.encode_message()
-            )
+        connection.handle_bytes_generator(
+            requestSession_msg_ask_acknowledge.encode_message()
+        )
     ):
         answer.append(
             Message.decode_binary_message(
