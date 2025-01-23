@@ -348,7 +348,7 @@ async def test_msg_multipart_chunks_reassembled_in_connection():
         assert msg.is_chunk_msg() or msg.is_chunk_msg_referencer()
 
     reassemble_result = Message.reassemble_chunk(decoded_partial_msg_list)
-    assert type(reassemble_result) == type(dataObjectResponse_msg)
+    assert type(reassemble_result) is type(dataObjectResponse_msg)
     assert len(reassemble_result.body.data_objects) == 2
     for idx, do in reassemble_result.body.data_objects.items():
         assert len(do.data) > size_limit

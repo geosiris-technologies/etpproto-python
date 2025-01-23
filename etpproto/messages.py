@@ -387,12 +387,12 @@ class Message(ABC):
                     return_record_name_override=True,
                 )
 
-                logging.debug(f"HEADER {recMH}")
+                logging.debug("HEADER %s", recMH)
 
                 logging.debug(
-                    f"classmethod decode_binary_message {object_res}"
+                    "classmethod decode_binary_message %s", object_res
                 )
-                logging.debug(f" ==> object_class {object_class}")
+                logging.debug(" ==> object_class  %s", object_class)
 
                 return Message(
                     mh.MessageHeader.parse_obj(recMH),
