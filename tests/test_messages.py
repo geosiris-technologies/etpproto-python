@@ -182,8 +182,8 @@ for i in range(20):
     )
 
 
-@pytest.mark.asyncio
-async def test_msg_finality():
+# @pytest.mark.asyncio
+def test_msg_finality():
     assert not requestSession_msg.is_final_msg()
     requestSession_msg.set_final_msg(True)
     assert requestSession_msg.is_final_msg()
@@ -191,8 +191,8 @@ async def test_msg_finality():
     assert not requestSession_msg.is_final_msg()
 
 
-@pytest.mark.asyncio
-async def test_msg_multiparity():
+# @pytest.mark.asyncio
+def test_msg_multiparity():
     assert not requestSession_msg.is_multipart_msg()
     requestSession_msg.add_header_flag(MessageFlags.MULTIPART)
     assert requestSession_msg.is_multipart_msg()
@@ -200,12 +200,12 @@ async def test_msg_multiparity():
     assert not requestSession_msg.is_multipart_msg()
 
 
-@pytest.mark.asyncio
-async def test_msg_simple_msg_exceed_size():
+# @pytest.mark.asyncio
+def test_msg_simple_msg_exceed_size():
     size_limit = 20
     connection_client = ETPConnection(connection_type=ConnectionType.CLIENT)
 
-    async for result in requestSession_msg.encode_message_generator(
+    for result in requestSession_msg.encode_message_generator(
         size_limit, connection_client
     ):
         decoded = Message.decode_binary_message(
@@ -215,15 +215,15 @@ async def test_msg_simple_msg_exceed_size():
         assert decoded.body.error.code == MaxSizeExceededError.code
 
 
-@pytest.mark.asyncio
-async def test_msg_multipart_map_split_in_2_parts():
+# @pytest.mark.asyncio
+def test_msg_multipart_map_split_in_2_parts():
     assert len(dataObjectResponse_msg.body.data_objects) == 2
     size_limit = 2000
     connection_client = ETPConnection(connection_type=ConnectionType.CLIENT)
     dataObjectResponse_msg.set_final_msg(True)
 
     decoded_partial_msg_list = []
-    async for part in dataObjectResponse_msg.encode_message_generator(
+    for part in dataObjectResponse_msg.encode_message_generator(
         size_limit, connection_client
     ):
         assert len(part) <= size_limit
@@ -249,8 +249,8 @@ async def test_msg_multipart_map_split_in_2_parts():
             assert decoded_k.is_final_msg()
 
 
-@pytest.mark.asyncio
-async def test_msg_multipart_map_split_in_2_parts_and_chunks():
+# @pytest.mark.asyncio
+def test_msg_multipart_map_split_in_2_parts_and_chunks():
     nb_data_objects = len(dataObjectResponse_msg.body.data_objects)
     assert len(dataObjectResponse_msg.body.data_objects) == 2
     size_limit = 500
@@ -264,7 +264,7 @@ async def test_msg_multipart_map_split_in_2_parts_and_chunks():
     dataObjectResponse_msg.set_final_msg(True)
 
     decoded_partial_msg_list = []
-    async for part in dataObjectResponse_msg.encode_message_generator(
+    for part in dataObjectResponse_msg.encode_message_generator(
         size_limit, connection_client
     ):
         assert len(part) <= size_limit
@@ -319,8 +319,8 @@ async def test_msg_multipart_map_split_in_2_parts_and_chunks():
     dataObjectResponse_msg.set_final_msg(False)
 
 
-@pytest.mark.asyncio
-async def test_msg_multipart_chunks_reassembled_in_connection():
+# @pytest.mark.asyncio
+def test_msg_multipart_chunks_reassembled_in_connection():
     nb_data_objects = len(dataObjectResponse_msg.body.data_objects)
     size_limit = 500
     connection_client = ETPConnection(connection_type=ConnectionType.CLIENT)
@@ -332,7 +332,7 @@ async def test_msg_multipart_chunks_reassembled_in_connection():
     )  # 50 is the size limit security (see message.py)
 
     decoded_partial_msg_list = []
-    async for part in dataObjectResponse_msg.encode_message_generator(
+    for part in dataObjectResponse_msg.encode_message_generator(
         size_limit, connection_client
     ):
         assert len(part) <= size_limit
@@ -355,14 +355,14 @@ async def test_msg_multipart_chunks_reassembled_in_connection():
         assert dataObjectResponse_msg.body.data_objects[idx].data == do.data
 
 
-@pytest.mark.asyncio
-async def test_msg_multipart_chunks_reassembled_in_connection_get_ressources():
+# @pytest.mark.asyncio
+def test_msg_multipart_chunks_reassembled_in_connection_get_ressources():
     size_limit = 500
     connection_client = ETPConnection(connection_type=ConnectionType.CLIENT)
     ressourceResponse_msg.set_final_msg(True)
 
     decoded_partial_msg_list = []
-    async for part in ressourceResponse_msg.encode_message_generator(
+    for part in ressourceResponse_msg.encode_message_generator(
         size_limit, connection_client
     ):
         assert len(part) <= size_limit

@@ -13,7 +13,7 @@ from dataclasses import dataclass
 from enum import IntFlag
 from io import BytesIO
 from math import ceil
-from typing import AsyncGenerator, Dict, List, Optional, Tuple, Any, Union
+from typing import Generator, Dict, List, Optional, Tuple, Any, Union
 
 import etptypes.energistics.etp.v12.datatypes.message_header as mh
 from etptypes import ETPModel, avro_schema
@@ -90,9 +90,9 @@ class Message(ABC):
     #       - Sinon, on si contient un BLOB, on essaie de le couper en plusieurs messages
     #       - Sinon on envoie un message d'erreur
     # max_bytes_per_msg : negative number for infinite size
-    async def encode_message_generator(  # noqa
+    def encode_message_generator(  # noqa
         self, max_bytes_per_msg, connection
-    ) -> AsyncGenerator[bytes, None]:
+    ) -> Generator[bytes, None]:
         # si requete on met le correlation_id sur le l'id du premier message
         # si self a un correlation_id alors c'est que ce n'était pas le premier
         correlation_id = (
@@ -181,11 +181,11 @@ class Message(ABC):
                         msg2.add_header_flag(MessageFlags.MULTIPART)
 
                         msg1.set_final_msg(False)
-                        async for part in msg1.encode_message_generator(
+                        for part in msg1.encode_message_generator(
                             max_bytes_per_msg, connection
                         ):
                             yield part
-                        async for part in msg2.encode_message_generator(
+                        for part in msg2.encode_message_generator(
                             max_bytes_per_msg, connection
                         ):
                             yield part
@@ -195,7 +195,7 @@ class Message(ABC):
                             and len(values) > 0
                             and self.is_chunkable()
                         ):
-                            async for part in _encode_message_generator_chunk(
+                            for part in _encode_message_generator_chunk(
                                 chunkable_msg=self,
                                 encoded_msg_size=body_size,
                                 max_bytes_per_msg=max_bytes_per_msg,
@@ -220,7 +220,7 @@ class Message(ABC):
             )
             if msg_err is not None:
                 msg_err.set_final_msg(True)
-                async for part in msg_err.encode_message_generator(
+                for part in msg_err.encode_message_generator(
                     -1, connection
                 ):
                     yield part
@@ -491,12 +491,12 @@ def decode_binary_message(
 
 
 # When calling thins function we are supposed to have only one entry in the data_objects map/list
-async def _encode_message_generator_chunk(
+def _encode_message_generator_chunk(
     chunkable_msg: Message,
     encoded_msg_size: int,
     max_bytes_per_msg: int,
     connection,
-) -> AsyncGenerator[bytes, None]:
+) -> Generator[bytes, None]:
     from etpproto.error import InternalError
 
     secure_size = 50  # TODO : ameliorer pour que le chunk fasse vraiment la taille max d'un message (il faudrait connaitre la taille de ce qui n'est pas binaire dans le chunk message)
@@ -585,7 +585,7 @@ async def _encode_message_generator_chunk(
             # send the message
             chunkable_msg.set_final_msg(False)
             chunkable_msg.add_header_flag(MessageFlags.MULTIPART)
-            async for part in chunkable_msg.encode_message_generator(
+            for part in chunkable_msg.encode_message_generator(
                 max_bytes_per_msg, connection
             ):
                 yield part
@@ -600,7 +600,7 @@ async def _encode_message_generator_chunk(
                     message_flags=MessageFlags.MULTIPART,
                 )
                 if current_chunk_msg is not None:
-                    async for (
+                    for (
                         part
                     ) in current_chunk_msg.encode_message_generator(
                         max_bytes_per_msg, connection
@@ -625,7 +625,7 @@ async def _encode_message_generator_chunk(
                 ),
             )
             if final_chunk_msg is not None:
-                async for part in final_chunk_msg.encode_message_generator(
+                for part in final_chunk_msg.encode_message_generator(
                     max_bytes_per_msg, connection
                 ):
                     yield part
