@@ -2,80 +2,84 @@
 ## Copyright (c) 2022-2023 Geosiris.
 ## SPDX-License-Identifier: Apache-2.0
 ##
-name: Tests
+name: Test and Lint
 
 on:
   push:
     branches:
       - main
+      - develop
   pull_request:
 
 jobs:
-  static-analysis:
-    name: Static analysis
+  test:
+    name: Run Pytest with Coverage
     runs-on: ubuntu-latest
-    steps:
 
-      - name: Checkout code
+    steps:
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        uses: ./.github/actions/prepare-poetry
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: "3.9"
 
-      - name: Install Python dependencies
-        run: pip install black flake8
-
-      # Post in-line comments for any issues found
-      # Do not run if coming from a forked repo
-      # See https://github.com/marketplace/actions/lint-action
-      - name: Run linters (with annotations)
-        # if: github.event.pull_request.head.repo.full_name == github.repository
-        uses: wearerequired/lint-action@v2
+      - name: 💾 Cache Poetry dependencies
+        uses: actions/cache@v3
         with:
-          auto_fix: false
-          black: true
-          black_auto_fix: false
-          flake8: true
-          flake8_auto_fix: false
+          path: ~/.cache/pypoetry
+          key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            poetry-${{ runner.os }}-
 
-#      # Alternative step that works with forked repo
-#      - name: Run linters (without annotations)
-#        # if: github.event.pull_request.head.repo.full_name != github.repository
-#        run: |
-#          poetry run flake8 .
-#          poetry run mypy etpproto
-
-  unit-tests:
-    name: Unit tests (Python ${{ matrix.python-version }})
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        python-version: ["3.9", "3.11"]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install dependencies
-        uses: ./.github/actions/prepare-poetry
+      - name: 📦 Install poetry
+        uses: abatilo/actions-poetry@v4
         with:
-          python-version: ${{ matrix.python-version }}
+          poetry-version: '2.1.1'
 
-      - name: Run pytest
-        run: poetry run pytest --cov=etpproto --cov-report=xml --junitxml=pytest.xml
-    
-      - name: Upload pytest artifacts
-        if: ${{ always() }}
+      - name: 📥 Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: 🧪 Run Pytest with Coverage
+        run: |
+          poetry run pytest --cov=py_etp_client --cov-report=term-missing --cov-report=xml 
+        # --cov-fail-under=80
+        env:
+          PYTHONWARNINGS: "ignore::DeprecationWarning"
+
+      - name: 📤 Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
-          name: Unit Test Results (Python ${{ matrix.python-version }})
-          path: pytest.xml
+          name: coverage-report
+          path: coverage.xml
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+  lint:
+    name: Run Flake8 Linting
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.xml
-          fail_ci_if_error: true
+          python-version: "3.9"
+
+      - name: 📦 Install poetry
+        uses: abatilo/actions-poetry@v4
+        with:
+          poetry-version: '2.1.1'
+
+      - name: 📥 Install dependencies (including dev)
+        run: poetry install --no-interaction --no-root
+
+      - name: 🛠️ Run Flake8
+        run: poetry run flake8 py_etp_client --count --show-source --statistics --output-file flake8-report.txt
+
+      - name: 📤 Upload Flake8 Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: flake8-report
+          path: flake8-report.txt
