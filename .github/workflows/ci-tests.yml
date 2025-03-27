@@ -43,7 +43,7 @@ jobs:
 
       - name: 🧪 Run Pytest with Coverage
         run: |
-          poetry run pytest --cov=py_etp_client --cov-report=term-missing --cov-report=xml 
+          poetry run pytest --cov=etpproto --cov-report=term-missing --cov-report=xml 
         # --cov-fail-under=80
         env:
           PYTHONWARNINGS: "ignore::DeprecationWarning"
@@ -76,7 +76,7 @@ jobs:
         run: poetry install --no-interaction --no-root
 
       - name: 🛠️ Run Flake8
-        run: poetry run flake8 py_etp_client --count --show-source --statistics --output-file flake8-report.txt
+        run: poetry run flake8 etpproto --count --show-source --statistics --output-file flake8-report.txt
 
       - name: 📤 Upload Flake8 Report
         uses: actions/upload-artifact@v4
