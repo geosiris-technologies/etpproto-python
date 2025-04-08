@@ -100,7 +100,7 @@ max-line-length = "88"
 version_strategy = "post-release"
 
 [tool.poetry-dynamic-versioning]
-enable = false
+enable = true
 vcs = "git"
 style = "pep440"
 format-jinja = """
