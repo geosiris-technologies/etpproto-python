@@ -1,10 +1,10 @@
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=2.0.0,<3.0.0", "poetry-dynamic-versioning>=1.0.1"]
 build-backend = "poetry_dynamic_versioning.backend"
 
 [project]
-dynamic = ["version", "dependencies"]
+dynamic = ["dependencies", "version"]
 name = "etpproto"
 description = "ETP protocol implementation"
 authors = [
@@ -25,9 +25,18 @@ requires-python = ">=3.9, <4.0"
 [tool.poetry]
 version = "0.0.0"
 
+[[tool.poetry.source]]
+name = "test-pypi"
+url = "https://test.pypi.org/simple/"
+priority = "explicit"
+
+
 [tool.poetry.dependencies]
 fastavro = "^1.6.1"
-etptypes = "^1.0.4"
+etptypes = "^1.0.12"
+# etptypes = {version = "^1.0.4", allow-prereleases = true, source = "test-pypi"}
+# etptypes = { file = "D:/Geosiris/Github/etp/etptypes-python/tmp/etptypes/dist/etptypes-1.0.11.dev5-py3-none-any.whl" }
+# etptypes = { file = "D:/Geosiris/Github/etp/avro-to-python/tmp/etptypes/dist/etptypes-1.0.11-py3-none-any.whl" }
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.5"
@@ -43,6 +52,8 @@ click = ">=8.1.3, <=8.1.3" # upper version than 8.0.2 fail with black
 isort = "^5.10.1"
 poetry-dynamic-versioning = "^1.8.1"
 jinja2 = "^3.1.6"
+pydantic-core = "^2.33.0"
+typeguard = "^4.4.2"
 
 
 [tool.black]
@@ -82,14 +93,14 @@ source = ["etpproto"]
 max-line-length = "88"
 
 
-[tool.poetry.requires-plugins]
-poetry-dynamic-versioning = { version = ">=1.0.0,<2.0.0", extras = ["plugin"] }
+[project.entry-points."poetry.plugin"]
+"dynamic-versioning" = "poetry_dynamic_versioning.plugin"
 
 [tool.dunamai]
 version_strategy = "post-release"
 
 [tool.poetry-dynamic-versioning]
-enable = true
+enable = false
 vcs = "git"
 style = "pep440"
 format-jinja = """
