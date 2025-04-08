@@ -11,103 +11,42 @@ on:
     types: [published]
 
 jobs:
-  build:
-    name: Build distribution
+  build-and-publish:
+    name: Build and Publish
     runs-on: ubuntu-latest
+
     steps:
-
-      - name: Checkout code
+      - name: 📥 Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Set up Python
+      - name: 🐍 Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: "3.9"
 
-      - name: Install Poetry
+      - name: 💾 Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: poetry-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            poetry-${{ runner.os }}-
+
+      - name: 📦 Install poetry
+        uses: abatilo/actions-poetry@v4
+        with:
+          poetry-version: '2.1.1'
+
+      - name: 📦 Install poetry-dynamic-versioning
+        run: poetry self add "poetry-dynamic-versioning[plugin]"
+
+      - name: 📥 Install dependencies
+        run: poetry install --no-interaction --no-root
+
+      - name: 🛠️ Build the package
+        run: poetry build
+
+      - name: 🚀 Publish to PyPI
         run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          pip install poetry-dynamic-versioning
-
-      - name: Build
-        run: |
-          poetry build
-
-      - name: Save build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-artifact
-          path: dist/
-
-  test:
-    name: Test
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-artifact
-          path: dist/
-
-      - name: Install from build
-        run: |
-          python -m pip install --upgrade pip
-          pip install pytest-mock
-          pip install etpproto --pre --target=dist --find-links=dist/
-
-      - name: Copy tests and example data to dist folder for testing against artifacts
-        run: |
-          cp -R tests dist/
-      # cp -R example_data dist/
-
-      - name: Run tests
-        run: pytest dist/tests
-
-  publish:
-    name: Publish to PyPI
-    needs: [build, test]
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.9'
-
-      # Retrieve the code and GIT history so that poetry-dynamic-versioning knows which version to upload
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Get build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: dist-artifact
-          path: dist/
-
-      - name: Install Poetry
-        run: |
-          python -m pip install --upgrade pip
-          pip install poetry
-          pip install poetry-dynamic-versioning
-
-      - name: Upload to PyPI
-        run: |
-          poetry config repositories.test https://test.pypi.org/legacy/
-          poetry publish --username ${{ secrets.POETRY_PYPI_TOKEN_USERNAME}} --password ${{ secrets.POETRY_PYPI_TOKEN_PASSWORD}}
+          poetry config pypi-token.pypi ${{ secrets.POETRY_PYPI_TOKEN_PASSWORD }}
+          poetry publish

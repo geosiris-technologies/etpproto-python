@@ -7,6 +7,7 @@ import logging
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import (
+    Generator,
     AsyncGenerator,
     Callable,
     ClassVar,
@@ -55,12 +56,12 @@ from etpproto.utils import ProtocolDict, get_all_etp_protocol_classes
 
 
 class Protocol:
-    async def handle_message(
+    def handle_message(
         self,
         etp_object: object,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
+    ) -> Generator[Optional[Message], None]:
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -385,9 +386,9 @@ class ETPConnection:
                 msg_id=self.consume_msg_id()
             )
 
-    async def send_msg_and_error_generator(
+    def send_msg_and_error_generator(
         self, msg: Message, err_msg: Message
-    ) -> AsyncGenerator[Tuple[int, bytes], None]:
+    ) -> Generator[Tuple[int, bytes], None]:
         current_msg_id = self.consume_msg_id()
 
         if msg:
@@ -398,7 +399,7 @@ class ETPConnection:
             # err_msg.header.message_id = self.message_id
             # self.message_id += 2
 
-            async for msg_part in msg.encode_message_generator(
+            for msg_part in msg.encode_message_generator(
                 self.client_info.getCapability(
                     "MaxWebSocketMessagePayloadSize"
                 ),
@@ -407,7 +408,7 @@ class ETPConnection:
                 yield (current_msg_id, msg_part)
 
             if err_msg:
-                async for msg_part in err_msg.encode_message_generator(
+                for msg_part in err_msg.encode_message_generator(
                     self.client_info.getCapability(
                         "MaxWebSocketMessagePayloadSize"
                     ),
@@ -417,7 +418,7 @@ class ETPConnection:
 
         elif err_msg:
             # logging.debug(f"{self.client_info.ip} : Encoding error")
-            async for msg_part in err_msg.encode_message_generator(
+            for msg_part in err_msg.encode_message_generator(
                 self.client_info.getCapability(
                     "MaxWebSocketMessagePayloadSize"
                 ),
@@ -439,7 +440,7 @@ class ETPConnection:
 
         async for msg in self._handle_message_generator(etp_input_msg):
             if msg is not None:
-                async for msg_part in msg.encode_message_generator(
+                for msg_part in msg.encode_message_generator(
                     self.client_info.getCapability(
                         "MaxWebSocketMessagePayloadSize"
                     ),

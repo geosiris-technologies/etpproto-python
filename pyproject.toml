@@ -1,54 +1,46 @@
-[build-system]
-requires = ["poetry-core>=1.0.0", "poetry-dynamic-versioning"]
-build-backend = "poetry.masonry.api"
 
-[tool.poetry]
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0", "poetry-dynamic-versioning>=1.0.1"]
+build-backend = "poetry_dynamic_versioning.backend"
+
+[project]
+dynamic = ["dependencies", "version"]
 name = "etpproto"
-version = "1.0.6.dev6" # Set at build time
 description = "ETP protocol implementation"
 authors = [
-    "Lionel Untereiner <lionel.untereiner@geosiris.com>", 
-    "Valentin Gauthier <valentin.gauthier@geosiris.com>"
+    {name = "Lionel Untereiner", email = "lionel.untereiner@geosiris.com"} ,
+    {name = "Valentin Gauthier", email = "valentin.gauthier@geosiris.com"}
 ]
 maintainers = [
-    "Lionel Untereiner <lionel.untereiner@geosiris.com>", 
-    "Valentin Gauthier <valentin.gauthier@geosiris.com>"
+    {name = "Valentin Gauthier", email = "valentin.gauthier@geosiris.com"}
 ]
 license = "Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/geosiris-technologies/etpproto-python"
 homepage = "http://www.geosiris.com"
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Environment :: Web Environment",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Information Technology",
-    "License :: OSI Approved :: Apache Software License",
-    "License :: OSI Approved :: Apache Software License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python",
-    "Topic :: Internet :: WWW/HTTP",
-    "Topic :: Internet",
-    "Topic :: Software Development :: Libraries :: Application Frameworks",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Software Development :: Libraries",
-    "Topic :: Software Development",
-    "Typing :: Typed",
-]
 keywords = ["ETP"]
+requires-python = ">=3.9, <4.0"
+
+
+[tool.poetry]
+version = "0.0.0"
+
+[[tool.poetry.source]]
+name = "test-pypi"
+url = "https://test.pypi.org/simple/"
+priority = "explicit"
+
 
 [tool.poetry.dependencies]
-python = "^3.9"
 fastavro = "^1.6.1"
-etptypes = "^1.0.1"
+etptypes = "^1.0.12"
+# etptypes = {version = "^1.0.4", allow-prereleases = true, source = "test-pypi"}
+# etptypes = { file = "D:/Geosiris/Github/etp/etptypes-python/tmp/etptypes/dist/etptypes-1.0.11.dev5-py3-none-any.whl" }
+# etptypes = { file = "D:/Geosiris/Github/etp/avro-to-python/tmp/etptypes/dist/etptypes-1.0.11-py3-none-any.whl" }
 
-[tool.poetry.dev-dependencies]
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.5"
 coverage = {extras = ["toml"], version = "7.6.10"}
-pytest = "^8.3.4"
 flake8 = "^7.1.0"
 black = "^24.10.0"
 pytest-cov = "^6.0.0"
@@ -58,6 +50,11 @@ pytest-asyncio = "^0.25.2"
 mypy = "^1.14.0"
 click = ">=8.1.3, <=8.1.3" # upper version than 8.0.2 fail with black
 isort = "^5.10.1"
+poetry-dynamic-versioning = "^1.8.1"
+jinja2 = "^3.1.6"
+pydantic-core = "^2.33.0"
+typeguard = "^4.4.2"
+
 
 [tool.black]
 line-length = 79
@@ -94,6 +91,13 @@ source = ["etpproto"]
 
 [tool.pylint.format]
 max-line-length = "88"
+
+
+[project.entry-points."poetry.plugin"]
+"dynamic-versioning" = "poetry_dynamic_versioning.plugin"
+
+[tool.dunamai]
+version_strategy = "post-release"
 
 [tool.poetry-dynamic-versioning]
 enable = true
