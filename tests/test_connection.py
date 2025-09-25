@@ -59,9 +59,11 @@ requestSession_msg = Message.get_object_message(
         supported_data_objects=supported_objects,
         supported_compression=["string"],
         supported_formats=["xml"],
-        current_date_time=int(datetime.utcnow().timestamp()),
+        current_date_time=int(datetime.now(timezone.utc).timestamp()),
         endpoint_capabilities={},
-        earliest_retained_change_time=int(datetime.utcnow().timestamp()),
+        earliest_retained_change_time=int(
+            datetime.now(timezone.utc).timestamp()
+        ),
     ),
     msg_id=2,  # to test the correlation id
 )
@@ -75,9 +77,11 @@ requestSession_msg_ask_acknowledge = Message.get_object_message(
         supported_data_objects=supported_objects,
         supported_compression=["string"],
         supported_formats=["xml"],
-        current_date_time=int(datetime.utcnow().timestamp()),
+        current_date_time=int(datetime.now(timezone.utc).timestamp()),
         endpoint_capabilities={},
-        earliest_retained_change_time=int(datetime.utcnow().timestamp()),
+        earliest_retained_change_time=int(
+            datetime.now(timezone.utc).timestamp()
+        ),
     ),
     msg_id=1,
     message_flags=0x10,
@@ -100,9 +104,11 @@ openSession_msg = Message.get_object_message(
         supported_compression="string",
         supported_formats=["xml"],
         session_id=uuid.uuid4(),
-        current_date_time=int(datetime.utcnow().timestamp()),
+        current_date_time=int(datetime.now(timezone.utc).timestamp()),
         endpoint_capabilities={},
-        earliest_retained_change_time=int(datetime.utcnow().timestamp()),
+        earliest_retained_change_time=int(
+            datetime.now(timezone.utc).timestamp()
+        ),
     ),
     msg_id=1,
 )

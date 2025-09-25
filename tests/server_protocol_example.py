@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import AsyncGenerator, Optional, Union
 import base64
 
@@ -265,9 +265,11 @@ class myCoreProtocol(CoreHandler):
             supported_compression="string",
             supported_formats=["xml"],
             session_id=msg.client_instance_id,
-            current_date_time=int(datetime.utcnow().timestamp()),
+            current_date_time=int(datetime.now(timezone.utc).timestamp()),
             endpoint_capabilities={},
-            earliest_retained_change_time=int(datetime.utcnow().timestamp()),
+            earliest_retained_change_time=int(
+                datetime.now(timezone.utc).timestamp()
+            ),
         )
         # TODO: Attention ici le msgId est mauvais il faudra le changer a posteriori
         yield Message.get_object_message(
@@ -290,7 +292,9 @@ class myCoreProtocol(CoreHandler):
     ) -> AsyncGenerator[Optional[Message], None]:
         print("#Core : Ping recieved")
         yield Message.get_object_message(
-            Pong(current_date_time=int(datetime.utcnow().timestamp())),
+            Pong(
+                current_date_time=int(datetime.now(timezone.utc).timestamp())
+            ),
             correlation_id=msg_header.message_id,
         )
 

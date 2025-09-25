@@ -86,9 +86,9 @@ requestSession_obj = RequestSession(
     supported_data_objects=supported_objects,
     supported_compression=["string"],
     supported_formats=["xml"],
-    current_date_time=int(datetime.utcnow().timestamp()),
+    current_date_time=int(datetime.now(timezone.utc).timestamp()),
     endpoint_capabilities={},
-    earliest_retained_change_time=int(datetime.utcnow().timestamp()),
+    earliest_retained_change_time=int(datetime.now(timezone.utc).timestamp()),
 )
 requestSession_msg = Message.get_object_message(requestSession_obj, msg_id=1)
 

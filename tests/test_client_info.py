@@ -4,7 +4,7 @@
 import pytest
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from etptypes.energistics.etp.v12.protocol.core.open_session import OpenSession
 from etptypes.energistics.etp.v12.protocol.core.request_session import (
@@ -63,13 +63,13 @@ my_open_session = OpenSession(
     supported_compression="string",
     supported_formats=["xml"],
     session_id=uuid.uuid4(),
-    current_date_time=int(datetime.utcnow().timestamp()),
+    current_date_time=int(datetime.now(timezone.utc).timestamp()),
     endpoint_capabilities={
         "MaxWebSocketFramePayloadSize": DataValue(item=666),
         "MaxWebSocketMessagePayloadSize": DataValue(item=10000000),
         "SupportsAlternateRequestUris": DataValue(item=True),
     },
-    earliest_retained_change_time=int(datetime.utcnow().timestamp()),
+    earliest_retained_change_time=int(datetime.now(timezone.utc).timestamp()),
 )
 
 my_request_session = RequestSession(
@@ -80,13 +80,13 @@ my_request_session = RequestSession(
     supported_data_objects=supported_objects,
     supported_compression=["string"],
     supported_formats=["xml"],
-    current_date_time=int(datetime.utcnow().timestamp()),
+    current_date_time=int(datetime.now(timezone.utc).timestamp()),
     endpoint_capabilities={
         "MaxWebSocketFramePayloadSize": DataValue(item=10000000),
         "MaxWebSocketMessagePayloadSize": DataValue(item=42),
         "SupportsAlternateRequestUris": DataValue(item=False),
     },
-    earliest_retained_change_time=int(datetime.utcnow().timestamp()),
+    earliest_retained_change_time=int(datetime.now(timezone.utc).timestamp()),
 )
 
 
