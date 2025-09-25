@@ -382,9 +382,13 @@ class Message(ABC):
         assert isinstance(recMH, dict)
         if recMH.get("protocol", -1) >= 0:
             try:
-                object_class = dict_map_pro_to_class[str(recMH["protocol"])][
-                    str(recMH["messageType"])
-                ]
+                try:
+                    object_class = dict_map_pro_to_class[str(recMH["protocol"])][
+                        str(recMH["messageType"])
+                    ]
+                except ValueError:
+                    from etpproto.error import NoSupportedProtocolsError
+                    raise NoSupportedProtocolsError()
 
                 # logging.debug("##> len : {len(binary)} posAfterHeaderRead {posAfterHeaderRead} fotell {fo.tell()}")
 
@@ -413,30 +417,37 @@ class Message(ABC):
                     ProtocolException(error=InvalidMessageTypeError().to_etp_error(), errors={}),
                 )
             except Exception as e:
-                logging.error(f"{e}, {traceback.format_exc()}")
-                # error, now we try to read it as an error, because error has now the protocol of the message send by the client
-                # try:
-                object_class = dict_map_pro_to_class["0"][
-                    str(recMH["messageType"])
-                ]
+                try:
+                    logging.error(f"{e}, {traceback.format_exc()}")
+                    # error, now we try to read it as an error, because error has now the protocol of the message send by the client
+                    # try:
+                    object_class = dict_map_pro_to_class["0"][
+                        str(recMH["messageType"])
+                    ]
 
-                logging.debug(f" ==> object_class {object_class}")
+                    logging.debug(f" ==> object_class {object_class}")
 
-                object_res = schemaless_reader(
-                    fo,
-                    json.loads(avro_schema(object_class)),
-                    return_record_name=True,
-                    return_record_name_override=True,
-                )
-                return Message(
-                    mh.MessageHeader.parse_obj(recMH),
-                    object_class.parse_obj(object_res),
-                )
-                # except Exception:
-                #     traceback.print_exc()
-                #     logging.error("### ERR : in decode_binary_message")
-                #     logging.error(f"{e}")
-                #     pass
+                    object_res = schemaless_reader(
+                        fo,
+                        json.loads(avro_schema(object_class)),
+                        return_record_name=True,
+                        return_record_name_override=True,
+                    )
+                    return Message(
+                        mh.MessageHeader.parse_obj(recMH),
+                        object_class.parse_obj(object_res),
+                    )
+                    # except Exception:
+                    #     traceback.print_exc()
+                    #     logging.error("### ERR : in decode_binary_message")
+                    #     logging.error(f"{e}")
+                    #     pass
+                except Exception:
+                    from etpproto.error import InternalError
+                    return Message(
+                        mh.MessageHeader.parse_obj(recMH),
+                        ProtocolException(error=InternalError("Failed to decode avro message").to_etp_error(), errors={}),
+                    )
 
         # If the message has not been read, it's should be a partial message
         fo.seek(posAfterHeaderRead)

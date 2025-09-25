@@ -119,6 +119,14 @@ class CommunicationProtocol(Enum):
     #: In ETP v1.1, this protocol was published as Protocol 8. It is now a custom protocol published by an Energistics member company. .
     WITSML_SOAP = 2000
 
+    @classmethod
+    def from_value(cls, value: int) -> CommunicationProtocol:
+        for protocol in CommunicationProtocol:
+            if protocol.value == value:
+                return protocol
+        raise UnsupportedProtocolError(value)
+
+
 
 @dataclass
 class ETPConnection:
@@ -320,7 +328,7 @@ class ETPConnection:
                             try:
                                 # Test si le protocol est supporte par le serveur
                                 if (
-                                    CommunicationProtocol(
+                                    CommunicationProtocol.from_value(
                                         etp_input_msg.header.protocol
                                     )
                                     in self.transition_table
@@ -330,7 +338,7 @@ class ETPConnection:
                                         async for (
                                             handled
                                         ) in self.transition_table[
-                                            CommunicationProtocol(
+                                            CommunicationProtocol.from_value(
                                                 etp_input_msg.header.protocol
                                             )
                                         ].handle_message(
@@ -369,7 +377,7 @@ class ETPConnection:
                                 )
                             except Exception as e:
                                 logging.error(
-                                    f"{self.client_info.ip}: _SERVER_ not handled exception",
+                                    f"{self.client_info.ip}: _SERVER_ not handled exception ({e}) {type(e)}",
                                 )
                                 raise e
                 else:  # not connected
