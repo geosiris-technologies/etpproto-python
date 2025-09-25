@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import logging
 import re
+import traceback
 import uuid as pyUUID
 from abc import ABC
 from copy import deepcopy
@@ -15,6 +16,10 @@ from io import BytesIO
 from math import ceil
 from typing import Generator, Dict, List, Optional, Tuple, Any, Union
 
+from etptypes.energistics.etp.v12.datatypes.error_info import ErrorInfo
+from etptypes.energistics.etp.v12.protocol.core.protocol_exception import (
+    ProtocolException,
+)
 import etptypes.energistics.etp.v12.datatypes.message_header as mh
 from etptypes import ETPModel, avro_schema
 from etptypes.energistics.etp.v12.datatypes.object.data_object import (
@@ -30,6 +35,7 @@ from etpproto.utils import (
     get_first_dict_attribute_name,
     get_first_list_attribute_name,
 )
+from etpproto.error import InvalidMessageTypeError
 
 
 class MessageFlags(
@@ -400,8 +406,13 @@ class Message(ABC):
                     mh.MessageHeader.parse_obj(recMH),
                     object_class.parse_obj(object_res),
                 )
+            except EOFError:
+                return Message(
+                    mh.MessageHeader.parse_obj(recMH),
+                    ProtocolException(error=InvalidMessageTypeError().to_etp_error(), errors={}),
+                )
             except Exception as e:
-                logging.error(f"{e}")
+                logging.error(f"{e}, {traceback.format_exc()}")
                 # error, now we try to read it as an error, because error has now the protocol of the message send by the client
                 # try:
                 object_class = dict_map_pro_to_class["0"][
