@@ -37,7 +37,6 @@ from etpproto.utils import (
 )
 
 
-
 class MessageFlags(
     IntFlag
 ):  # enum.Flag class would be a better choice but doesn't work with our operations
@@ -226,9 +225,7 @@ class Message(ABC):
             )
             if msg_err is not None:
                 msg_err.set_final_msg(True)
-                for part in msg_err.encode_message_generator(
-                    -1, connection
-                ):
+                for part in msg_err.encode_message_generator(-1, connection):
                     yield part
             else:
                 raise err
@@ -383,11 +380,12 @@ class Message(ABC):
         if recMH.get("protocol", -1) >= 0:
             try:
                 try:
-                    object_class = dict_map_pro_to_class[str(recMH["protocol"])][
-                        str(recMH["messageType"])
-                    ]
+                    object_class = dict_map_pro_to_class[
+                        str(recMH["protocol"])
+                    ][str(recMH["messageType"])]
                 except ValueError:
                     from etpproto.error import NoSupportedProtocolsError
+
                     raise NoSupportedProtocolsError()
 
                 # logging.debug("##> len : {len(binary)} posAfterHeaderRead {posAfterHeaderRead} fotell {fo.tell()}")
@@ -412,9 +410,13 @@ class Message(ABC):
                 )
             except EOFError:
                 from etpproto.error import InvalidMessageTypeError
+
                 return Message(
                     mh.MessageHeader.parse_obj(recMH),
-                    ProtocolException(error=InvalidMessageTypeError().to_etp_error(), errors={}),
+                    ProtocolException(
+                        error=InvalidMessageTypeError().to_etp_error(),
+                        errors={},
+                    ),
                 )
             except Exception as e:
                 try:
@@ -444,9 +446,15 @@ class Message(ABC):
                     #     pass
                 except Exception:
                     from etpproto.error import InternalError
+
                     return Message(
                         mh.MessageHeader.parse_obj(recMH),
-                        ProtocolException(error=InternalError("Failed to decode avro message").to_etp_error(), errors={}),
+                        ProtocolException(
+                            error=InternalError(
+                                "Failed to decode avro message"
+                            ).to_etp_error(),
+                            errors={},
+                        ),
                     )
 
         # If the message has not been read, it's should be a partial message
@@ -623,9 +631,7 @@ def _encode_message_generator_chunk(
                     message_flags=MessageFlags.MULTIPART,
                 )
                 if current_chunk_msg is not None:
-                    for (
-                        part
-                    ) in current_chunk_msg.encode_message_generator(
+                    for part in current_chunk_msg.encode_message_generator(
                         max_bytes_per_msg, connection
                     ):
                         yield part

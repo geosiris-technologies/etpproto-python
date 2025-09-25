@@ -127,7 +127,6 @@ class CommunicationProtocol(Enum):
         raise UnsupportedProtocolError(value)
 
 
-
 @dataclass
 class ETPConnection:
     """
