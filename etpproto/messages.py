@@ -35,7 +35,7 @@ from etpproto.utils import (
     get_first_dict_attribute_name,
     get_first_list_attribute_name,
 )
-from etpproto.error import InvalidMessageTypeError
+
 
 
 class MessageFlags(
@@ -407,6 +407,7 @@ class Message(ABC):
                     object_class.parse_obj(object_res),
                 )
             except EOFError:
+                from etpproto.error import InvalidMessageTypeError
                 return Message(
                     mh.MessageHeader.parse_obj(recMH),
                     ProtocolException(error=InvalidMessageTypeError().to_etp_error(), errors={}),
