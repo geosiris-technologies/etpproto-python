@@ -58,15 +58,12 @@ from etpproto.utils import ProtocolDict, get_all_etp_protocol_classes
 
 
 class Protocol:
-    def handle_message(
+    async def handle_message(
         self,
         etp_object: object,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
-    ) -> Union[
-        Generator[Optional[Message], None],
-        AsyncGenerator[Optional[Message], None],
-    ]:
+    ) -> AsyncGenerator[Optional[Message], None]:
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -342,9 +339,7 @@ class ETPConnection:
                                         async for (
                                             handled
                                         ) in self.transition_table[
-                                            # CommunicationProtocol.from_value(
                                             etp_input_msg.header.protocol
-                                            # )
                                         ].handle_message(
                                             etp_object=etp_input_msg.body,
                                             msg_header=etp_input_msg.header,
@@ -479,6 +474,10 @@ class ETPConnection:
                     proto = getattr(cls_protocol, "protocol_id")
             elif isinstance(proto, CommunicationProtocol):
                 proto = proto.value
+            else:
+                raise ValueError(
+                    "The protocol parameter must be an int or a CommunicationProtocol"
+                )
             print(f"Register protocol {proto} to {cls_protocol}")
             cls.transition_table[proto] = cls_protocol()
             return cls_protocol

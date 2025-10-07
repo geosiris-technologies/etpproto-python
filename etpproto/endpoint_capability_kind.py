@@ -4,6 +4,9 @@
 import sys
 from dataclasses import dataclass, field
 from typing import ClassVar, List, Optional, Union
+from etptypes.energistics.etp.v12.datatypes.endpoint_capability_kind import (
+    EndpointCapabilityKind as ECKind,
+)
 
 
 @dataclass
@@ -13,6 +16,21 @@ class EndpointCapabilityKind:
     _min: ClassVar = None
     _max: ClassVar = None
     _unit: ClassVar[Optional[str]] = None
+
+    @classmethod
+    def name(cls) -> str:
+        try:
+            return cls.as_eck().value
+        except ValueError:
+            # Return the class name if no matching enum value is found
+            return cls.__name__
+
+    @classmethod
+    def as_eck(cls) -> Optional[ECKind]:
+        try:
+            return ECKind(cls.__name__)
+        except ValueError:
+            return None
 
 
 @dataclass
@@ -253,3 +271,8 @@ class SupportsMessageHeaderExtensions(EndpointCapabilityKind):
 
 def kind_from_name(classname):
     return getattr(sys.modules[__name__], classname)
+
+
+if __name__ == "__main__":
+    print(ActiveTimeoutPeriod.name())
+    print(ActiveTimeoutPeriod.as_eck())

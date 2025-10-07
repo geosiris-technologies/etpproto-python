@@ -11,11 +11,7 @@ from etptypes.energistics.etp.v12.protocol.core.request_session import (
     RequestSession,
 )
 
-from etpproto.endpoint_capability_kind import kind_from_name
-
-from etptypes.energistics.etp.v12.datatypes.endpoint_capability_kind import (
-    EndpointCapabilityKind,
-)
+from etpproto.endpoint_capability_kind import *
 
 
 @dataclass
@@ -24,8 +20,8 @@ class ClientInfo:
 
     endpoint_capabilities: Dict[str, Any] = field(
         default_factory=lambda: {
-            EndpointCapabilityKind.MAX_WEB_SOCKET_FRAME_PAYLOAD_SIZE.value: 10000,
-            EndpointCapabilityKind.MAX_WEB_SOCKET_MESSAGE_PAYLOAD_SIZE.value: 10000,
+            MaxWebSocketFramePayloadSize.name(): 10000,
+            MaxWebSocketMessagePayloadSize.name(): 10000,
         }
     )
     login: str = field(default="anonymousUser")
