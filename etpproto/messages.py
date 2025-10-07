@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
 import json
 import logging
 import re
@@ -68,6 +69,12 @@ class MessageFlags(
     HAS_HEADER_EXTENSION = 0x20
 
 
+# @lru_cache(maxsize=128)
+@lru_cache(maxsize=None)
+def get_cached_schema(cls_type):
+    return json.loads(avro_schema(cls_type))
+
+
 @dataclass
 class Message(ABC):
     header: mh.MessageHeader
@@ -76,11 +83,11 @@ class Message(ABC):
     def encode_message(self) -> bytes:
         bio = BytesIO()
         if self.header:
-            header_schema = json.loads(mh.avro_schema)
+            header_schema = _MSG_HEADER_SCHEMA
             schemaless_writer(
                 bio, header_schema, self.header.dict(by_alias=True)
             )
-        obj_schema = json.loads(avro_schema(type(self.body)))
+        obj_schema = get_cached_schema(type(self.body))
         schemaless_writer(bio, obj_schema, self.body.dict(by_alias=True))
 
         value = bio.getvalue()
@@ -115,7 +122,7 @@ class Message(ABC):
         from etpproto.error import ETPError, MaxSizeExceededError
 
         # Header encoding
-        header_schema = json.loads(mh.avro_schema)
+        header_schema = _MSG_HEADER_SCHEMA
         out_h0 = BytesIO()
         if self.header:
             schemaless_writer(
@@ -124,7 +131,7 @@ class Message(ABC):
 
         # Body encoding
         out_body = BytesIO()
-        obj_schema = json.loads(avro_schema(type(self.body)))
+        obj_schema = get_cached_schema(type(self.body))
         schemaless_writer(out_body, obj_schema, self.body.dict(by_alias=True))
 
         # Size computation
@@ -393,7 +400,7 @@ class Message(ABC):
                     raise NoSupportedProtocolsError()
 
                 # logging.debug("##> len : {len(binary)} posAfterHeaderRead {posAfterHeaderRead} fotell {fo.tell()}")
-                _scheme = json.loads(avro_schema(object_class))
+                _scheme = get_cached_schema(object_class)
                 object_res = schemaless_reader(
                     fo,
                     reader_schema=_scheme,
@@ -433,7 +440,7 @@ class Message(ABC):
                     ]
 
                     logging.debug(f" ==> object_class {object_class}")
-                    _scheme = json.loads(avro_schema(object_class))
+                    _scheme = get_cached_schema(object_class)
                     object_res = schemaless_reader(
                         fo,
                         reader_schema=_scheme,
@@ -480,7 +487,7 @@ class Message(ABC):
             logging.debug(f"get_object_message {etp_object}")
             logging.debug(f"get_object_message {type(etp_object)}")
 
-            obj_schema = json.loads(avro_schema(type(etp_object)))
+            obj_schema = get_cached_schema(type(etp_object))
 
             if has_header:
                 header = mh.MessageHeader(
@@ -513,10 +520,11 @@ def decode_binary_message(
     object_class = dict_map_pro_to_class[str(recMH.get("protocol", -1))][
         str(recMH["messageType"])
     ]
+    scheme = get_cached_schema(object_class)
     object_res = schemaless_reader(
         fo=fo,
-        writer_schema=None,
-        reader_schema=json.loads(avro_schema(object_class)),
+        writer_schema=scheme,
+        reader_schema=scheme,
         return_record_name=True,
         return_record_name_override=True,
     )
