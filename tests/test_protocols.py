@@ -44,6 +44,8 @@ try:
 except Exception:
     from server_protocol_example import *
 
+from etpproto.connection import ETPConnection
+from etpproto.messages import Message
 
 #     ____        __
 #    / __ \____ _/ /_____ __________  ____ _________

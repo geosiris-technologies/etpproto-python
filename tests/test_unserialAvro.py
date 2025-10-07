@@ -3,7 +3,7 @@
 
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timezone
 
 import etptypes.energistics.etp.v12.datatypes.message_header as mh
 import etptypes.energistics.etp.v12.protocol.core.open_session as op
@@ -102,9 +102,11 @@ def test_unserialAvroRequestSession() -> None:
         "supportedCompression": "string",
         "supportedFormats": ["xml"],
         "sessionId": b"360559be-0634-47",
-        "currentDateTime": int(datetime.utcnow().timestamp()),
+        "currentDateTime": int(datetime.now(timezone.utc).timestamp()),
         "endpointCapabilities": {},
-        "earliestRetainedChangeTime": int(datetime.utcnow().timestamp()),
+        "earliestRetainedChangeTime": int(
+            datetime.now(timezone.utc).timestamp()
+        ),
     }
 
     schemaHeader = json.loads(mh.avro_schema)

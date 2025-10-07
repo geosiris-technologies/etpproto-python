@@ -1,81 +1,30 @@
+
 # Copyright (c) 2022-2023 Geosiris.
 # SPDX-License-Identifier: Apache-2.0
-
-from typing import AsyncGenerator, Optional, Protocol, Union
-
-from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
-from etptypes.energistics.etp.v12.protocol.channel_streaming.channel_data import (
-    ChannelData,
-)
-from etptypes.energistics.etp.v12.protocol.channel_streaming.channel_metadata import (
-    ChannelMetadata,
-)
-from etptypes.energistics.etp.v12.protocol.channel_streaming.start_streaming import (
-    StartStreaming,
-)
-from etptypes.energistics.etp.v12.protocol.channel_streaming.stop_streaming import (
-    StopStreaming,
-)
-from etptypes.energistics.etp.v12.protocol.channel_streaming.truncate_channels import (
-    TruncateChannels,
-)
+from typing import AsyncGenerator, Optional, Union, ClassVar
+from dataclasses import dataclass
 
 from etpproto.client_info import ClientInfo
 from etpproto.error import InvalidMessageTypeError, NotSupportedError
 from etpproto.messages import Message
+from etpproto.connection import Protocol
 from etpproto.utils import snake_case
 
+from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
+from etptypes.energistics.etp.v12.protocol.channel_streaming.start_streaming import StartStreaming
+from etptypes.energistics.etp.v12.protocol.channel_streaming.stop_streaming import StopStreaming
+from etptypes.energistics.etp.v12.protocol.channel_streaming.channel_data import ChannelData
+from etptypes.energistics.etp.v12.protocol.channel_streaming.truncate_channels import TruncateChannels
+from etptypes.energistics.etp.v12.protocol.channel_streaming.channel_metadata import ChannelMetadata
+
+
+@dataclass
 class ChannelStreamingHandler(Protocol):
-    async def on_channel_data(
-        self,
-        msg: ChannelData,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_channel_metadata(
-        self,
-        msg: ChannelMetadata,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_start_streaming(
-        self,
-        msg: StartStreaming,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_stop_streaming(
-        self,
-        msg: StopStreaming,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_truncate_channels(
-        self,
-        msg: TruncateChannels,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
+    protocol_id: ClassVar[int] = 1
+    protocol_name: ClassVar[str] = "ChannelStreaming"
+    protocol_namespace: ClassVar[str] = "Energistics.Etp.v12.Protocol.ChannelStreaming"
 
     async def handle_message(
         self,
@@ -96,3 +45,85 @@ class ChannelStreamingHandler(Protocol):
 
         else:
             raise InvalidMessageTypeError()
+
+    # Define handlers for each message type in the protocol
+
+    async def on_start_streaming(
+        self,
+        msg: StartStreaming,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for StartStreaming messages.
+        Message Type: 3
+        Sender Role: consumer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_stop_streaming(
+        self,
+        msg: StopStreaming,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for StopStreaming messages.
+        Message Type: 4
+        Sender Role: consumer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_channel_data(
+        self,
+        msg: ChannelData,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for ChannelData messages.
+        Message Type: 2
+        Sender Role: producer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_truncate_channels(
+        self,
+        msg: TruncateChannels,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for TruncateChannels messages.
+        Message Type: 5
+        Sender Role: producer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_channel_metadata(
+        self,
+        msg: ChannelMetadata,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for ChannelMetadata messages.
+        Message Type: 1
+        Sender Role: producer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )

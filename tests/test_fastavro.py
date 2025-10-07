@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from io import BytesIO
 
 import etptypes.energistics.etp.v12.datatypes.message_header as mh
@@ -96,9 +96,11 @@ def testAvroSerialOpenSession():
             "supportedCompression": "string",
             "supportedFormats": ["xml"],
             "sessionId": b"360559be-0634-47",
-            "currentDateTime": int(datetime.utcnow().timestamp()),
+            "currentDateTime": int(datetime.now(timezone.utc).timestamp()),
             "endpointCapabilities": {},
-            "earliestRetainedChangeTime": int(datetime.utcnow().timestamp()),
+            "earliestRetainedChangeTime": int(
+                datetime.now(timezone.utc).timestamp()
+            ),
         }
     ]
 

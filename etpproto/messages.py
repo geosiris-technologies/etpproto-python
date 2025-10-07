@@ -3,9 +3,11 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
 import json
 import logging
 import re
+import traceback
 import uuid as pyUUID
 from abc import ABC
 from copy import deepcopy
@@ -15,6 +17,10 @@ from io import BytesIO
 from math import ceil
 from typing import Generator, Dict, List, Optional, Tuple, Any, Union
 
+from etptypes.energistics.etp.v12.datatypes.error_info import ErrorInfo
+from etptypes.energistics.etp.v12.protocol.core.protocol_exception import (
+    ProtocolException,
+)
 import etptypes.energistics.etp.v12.datatypes.message_header as mh
 from etptypes import ETPModel, avro_schema
 from etptypes.energistics.etp.v12.datatypes.object.data_object import (
@@ -30,6 +36,9 @@ from etpproto.utils import (
     get_first_dict_attribute_name,
     get_first_list_attribute_name,
 )
+
+
+_MSG_HEADER_SCHEMA = json.loads(mh.avro_schema)
 
 
 class MessageFlags(
@@ -60,6 +69,12 @@ class MessageFlags(
     HAS_HEADER_EXTENSION = 0x20
 
 
+# @lru_cache(maxsize=128)
+@lru_cache(maxsize=None)
+def get_cached_schema(cls_type):
+    return json.loads(avro_schema(cls_type))
+
+
 @dataclass
 class Message(ABC):
     header: mh.MessageHeader
@@ -68,11 +83,11 @@ class Message(ABC):
     def encode_message(self) -> bytes:
         bio = BytesIO()
         if self.header:
-            header_schema = json.loads(mh.avro_schema)
+            header_schema = _MSG_HEADER_SCHEMA
             schemaless_writer(
                 bio, header_schema, self.header.dict(by_alias=True)
             )
-        obj_schema = json.loads(avro_schema(type(self.body)))
+        obj_schema = get_cached_schema(type(self.body))
         schemaless_writer(bio, obj_schema, self.body.dict(by_alias=True))
 
         value = bio.getvalue()
@@ -107,7 +122,7 @@ class Message(ABC):
         from etpproto.error import ETPError, MaxSizeExceededError
 
         # Header encoding
-        header_schema = json.loads(mh.avro_schema)
+        header_schema = _MSG_HEADER_SCHEMA
         out_h0 = BytesIO()
         if self.header:
             schemaless_writer(
@@ -116,7 +131,7 @@ class Message(ABC):
 
         # Body encoding
         out_body = BytesIO()
-        obj_schema = json.loads(avro_schema(type(self.body)))
+        obj_schema = get_cached_schema(type(self.body))
         schemaless_writer(out_body, obj_schema, self.body.dict(by_alias=True))
 
         # Size computation
@@ -220,9 +235,7 @@ class Message(ABC):
             )
             if msg_err is not None:
                 msg_err.set_final_msg(True)
-                for part in msg_err.encode_message_generator(
-                    -1, connection
-                ):
+                for part in msg_err.encode_message_generator(-1, connection):
                     yield part
             else:
                 raise err
@@ -279,8 +292,8 @@ class Message(ABC):
         This means that data will be sent after in chunk messages
         """
         if not self.is_chunk_msg() and self.is_chunkable():
-            if isinstance(self.body.data_objects, list):
-                for do in self.body.data_objects:
+            if isinstance(self.body.data_objects, list):  # type: ignore[attr-defined]
+                for do in self.body.data_objects:  # type: ignore[attr-defined]
                     if not (
                         do.blob_id is not None
                         and (do.data is None or do.data == "")
@@ -367,7 +380,8 @@ class Message(ABC):
         fo = BytesIO(binary)
         recMH = schemaless_reader(
             fo=fo,
-            writer_schema=json.loads(mh.avro_schema),
+            reader_schema=_MSG_HEADER_SCHEMA,
+            writer_schema=_MSG_HEADER_SCHEMA,
             return_record_name=True,
             return_record_name_override=True,
         )
@@ -376,15 +390,21 @@ class Message(ABC):
         assert isinstance(recMH, dict)
         if recMH.get("protocol", -1) >= 0:
             try:
-                object_class = dict_map_pro_to_class[str(recMH["protocol"])][
-                    str(recMH["messageType"])
-                ]
+                try:
+                    object_class = dict_map_pro_to_class[
+                        str(recMH["protocol"])
+                    ][str(recMH["messageType"])]
+                except ValueError:
+                    from etpproto.error import NoSupportedProtocolsError
+
+                    raise NoSupportedProtocolsError()
 
                 # logging.debug("##> len : {len(binary)} posAfterHeaderRead {posAfterHeaderRead} fotell {fo.tell()}")
-
+                _scheme = get_cached_schema(object_class)
                 object_res = schemaless_reader(
                     fo,
-                    json.loads(avro_schema(object_class)),
+                    reader_schema=_scheme,
+                    writer_schema=_scheme,
                     return_record_name=True,
                     return_record_name_override=True,
                 )
@@ -400,31 +420,55 @@ class Message(ABC):
                     mh.MessageHeader.parse_obj(recMH),
                     object_class.parse_obj(object_res),
                 )
-            except Exception as e:
-                logging.error(f"{e}")
-                # error, now we try to read it as an error, because error has now the protocol of the message send by the client
-                # try:
-                object_class = dict_map_pro_to_class["0"][
-                    str(recMH["messageType"])
-                ]
+            except EOFError:
+                from etpproto.error import InvalidMessageTypeError
 
-                logging.debug(f" ==> object_class {object_class}")
-
-                object_res = schemaless_reader(
-                    fo,
-                    json.loads(avro_schema(object_class)),
-                    return_record_name=True,
-                    return_record_name_override=True,
-                )
                 return Message(
                     mh.MessageHeader.parse_obj(recMH),
-                    object_class.parse_obj(object_res),
+                    ProtocolException(
+                        error=InvalidMessageTypeError().to_etp_error(),
+                        errors={},
+                    ),
                 )
-                # except Exception:
-                #     traceback.print_exc()
-                #     logging.error("### ERR : in decode_binary_message")
-                #     logging.error(f"{e}")
-                #     pass
+            except Exception as e:
+                try:
+                    logging.error(f"{e}, {traceback.format_exc()}")
+                    # error, now we try to read it as an error, because error has now the protocol of the message send by the client
+                    # try:
+                    object_class = dict_map_pro_to_class["0"][
+                        str(recMH["messageType"])
+                    ]
+
+                    logging.debug(f" ==> object_class {object_class}")
+                    _scheme = get_cached_schema(object_class)
+                    object_res = schemaless_reader(
+                        fo,
+                        reader_schema=_scheme,
+                        writer_schema=_scheme,
+                        return_record_name=True,
+                        return_record_name_override=True,
+                    )
+                    return Message(
+                        mh.MessageHeader.parse_obj(recMH),
+                        object_class.parse_obj(object_res),
+                    )
+                    # except Exception:
+                    #     traceback.print_exc()
+                    #     logging.error("### ERR : in decode_binary_message")
+                    #     logging.error(f"{e}")
+                    #     pass
+                except Exception:
+                    from etpproto.error import InternalError
+
+                    return Message(
+                        mh.MessageHeader.parse_obj(recMH),
+                        ProtocolException(
+                            error=InternalError(
+                                "Failed to decode avro message"
+                            ).to_etp_error(),
+                            errors={},
+                        ),
+                    )
 
         # If the message has not been read, it's should be a partial message
         fo.seek(posAfterHeaderRead)
@@ -443,7 +487,7 @@ class Message(ABC):
             logging.debug(f"get_object_message {etp_object}")
             logging.debug(f"get_object_message {type(etp_object)}")
 
-            obj_schema = json.loads(avro_schema(type(etp_object)))
+            obj_schema = get_cached_schema(type(etp_object))
 
             if has_header:
                 header = mh.MessageHeader(
@@ -467,7 +511,8 @@ def decode_binary_message(
     fo = BytesIO(binary)
     recMH = schemaless_reader(
         fo=fo,
-        writer_schema=json.loads(mh.avro_schema),
+        writer_schema=_MSG_HEADER_SCHEMA,
+        reader_schema=_MSG_HEADER_SCHEMA,
         return_record_name=True,
         return_record_name_override=True,
     )
@@ -475,9 +520,11 @@ def decode_binary_message(
     object_class = dict_map_pro_to_class[str(recMH.get("protocol", -1))][
         str(recMH["messageType"])
     ]
+    scheme = get_cached_schema(object_class)
     object_res = schemaless_reader(
         fo=fo,
-        writer_schema=json.loads(avro_schema(object_class)),
+        writer_schema=scheme,
+        reader_schema=scheme,
         return_record_name=True,
         return_record_name_override=True,
     )
@@ -600,9 +647,7 @@ def _encode_message_generator_chunk(
                     message_flags=MessageFlags.MULTIPART,
                 )
                 if current_chunk_msg is not None:
-                    for (
-                        part
-                    ) in current_chunk_msg.encode_message_generator(
+                    for part in current_chunk_msg.encode_message_generator(
                         max_bytes_per_msg, connection
                     ):
                         yield part

@@ -13,20 +13,21 @@ from etpproto.utils import snake_case
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
 
-from etptypes.energistics.etp.v12.protocol.store.delete_data_objects import DeleteDataObjects
-from etptypes.energistics.etp.v12.protocol.store.get_data_objects import GetDataObjects
-from etptypes.energistics.etp.v12.protocol.store.delete_data_objects_response import DeleteDataObjectsResponse
-from etptypes.energistics.etp.v12.protocol.store.chunk import Chunk
-from etptypes.energistics.etp.v12.protocol.store.put_data_objects_response import PutDataObjectsResponse
-from etptypes.energistics.etp.v12.protocol.store.get_data_objects_response import GetDataObjectsResponse
-from etptypes.energistics.etp.v12.protocol.store.put_data_objects import PutDataObjects
+from etptypes.energistics.etp.v12.protocol.dataspace_osdu.get_dataspace_info import GetDataspaceInfo
+from etptypes.energistics.etp.v12.protocol.dataspace_osdu.get_dataspace_info_response import GetDataspaceInfoResponse
+from etptypes.energistics.etp.v12.protocol.dataspace_osdu.copy_dataspaces_content import CopyDataspacesContent
+from etptypes.energistics.etp.v12.protocol.dataspace_osdu.copy_dataspaces_content_response import CopyDataspacesContentResponse
+from etptypes.energistics.etp.v12.protocol.dataspace_osdu.lock_dataspaces import LockDataspaces
+from etptypes.energistics.etp.v12.protocol.dataspace_osdu.lock_dataspaces_response import LockDataspacesResponse
+from etptypes.energistics.etp.v12.protocol.dataspace_osdu.copy_to_dataspace import CopyToDataspace
+from etptypes.energistics.etp.v12.protocol.dataspace_osdu.copy_to_dataspace_response import CopyToDataspaceResponse
 
 
 @dataclass
-class StoreHandler(Protocol):
-    protocol_id: ClassVar[int] = 4
-    protocol_name: ClassVar[str] = "Store"
-    protocol_namespace: ClassVar[str] = "Energistics.Etp.v12.Protocol.Store"
+class DataspaceOSDUHandler(Protocol):
+    protocol_id: ClassVar[int] = 2424
+    protocol_name: ClassVar[str] = "DataspaceOSDU"
+    protocol_namespace: ClassVar[str] = "Energistics.Etp.v12.Protocol.DataspaceOSDU"
 
     async def handle_message(
         self,
@@ -50,30 +51,14 @@ class StoreHandler(Protocol):
 
     # Define handlers for each message type in the protocol
 
-    async def on_delete_data_objects(
+    async def on_get_dataspace_info(
         self,
-        msg: DeleteDataObjects,
+        msg: GetDataspaceInfo,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for DeleteDataObjects messages.
-        Message Type: 3
-        Sender Role: customer
-        Multipart: False
-        '''
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_get_data_objects(
-        self,
-        msg: GetDataObjects,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        '''
-        Handler for GetDataObjects messages.
+        Handler for GetDataspaceInfo messages.
         Message Type: 1
         Sender Role: customer
         Multipart: False
@@ -82,15 +67,15 @@ class StoreHandler(Protocol):
             correlation_id=msg_header.message_id
         )
 
-    async def on_delete_data_objects_response(
+    async def on_get_dataspace_info_response(
         self,
-        msg: DeleteDataObjectsResponse,
+        msg: GetDataspaceInfoResponse,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for DeleteDataObjectsResponse messages.
-        Message Type: 10
+        Handler for GetDataspaceInfoResponse messages.
+        Message Type: 2
         Sender Role: store
         Multipart: True
         '''
@@ -98,46 +83,30 @@ class StoreHandler(Protocol):
             correlation_id=msg_header.message_id
         )
 
-    async def on_chunk(
+    async def on_copy_dataspaces_content(
         self,
-        msg: Chunk,
+        msg: CopyDataspacesContent,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for Chunk messages.
-        Message Type: 8
-        Sender Role: store,customer
-        Multipart: True
+        Handler for CopyDataspacesContent messages.
+        Message Type: 3
+        Sender Role: customer
+        Multipart: False
         '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
 
-    async def on_put_data_objects_response(
+    async def on_copy_dataspaces_content_response(
         self,
-        msg: PutDataObjectsResponse,
+        msg: CopyDataspacesContentResponse,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for PutDataObjectsResponse messages.
-        Message Type: 9
-        Sender Role: store
-        Multipart: True
-        '''
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_get_data_objects_response(
-        self,
-        msg: GetDataObjectsResponse,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        '''
-        Handler for GetDataObjectsResponse messages.
+        Handler for CopyDataspacesContentResponse messages.
         Message Type: 4
         Sender Role: store
         Multipart: True
@@ -146,16 +115,64 @@ class StoreHandler(Protocol):
             correlation_id=msg_header.message_id
         )
 
-    async def on_put_data_objects(
+    async def on_lock_dataspaces(
         self,
-        msg: PutDataObjects,
+        msg: LockDataspaces,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for PutDataObjects messages.
-        Message Type: 2
+        Handler for LockDataspaces messages.
+        Message Type: 5
         Sender Role: customer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_lock_dataspaces_response(
+        self,
+        msg: LockDataspacesResponse,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for LockDataspacesResponse messages.
+        Message Type: 6
+        Sender Role: store
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_copy_to_dataspace(
+        self,
+        msg: CopyToDataspace,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for CopyToDataspace messages.
+        Message Type: 7
+        Sender Role: customer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_copy_to_dataspace_response(
+        self,
+        msg: CopyToDataspaceResponse,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for CopyToDataspaceResponse messages.
+        Message Type: 8
+        Sender Role: store
         Multipart: True
         '''
         yield NotSupportedError().to_etp_message(

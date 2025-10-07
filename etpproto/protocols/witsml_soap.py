@@ -13,25 +13,27 @@ from etpproto.utils import snake_case
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
 
-from etptypes.energistics.etp.v12.protocol.data_array.put_data_arrays_response import PutDataArraysResponse
-from etptypes.energistics.etp.v12.protocol.data_array.put_data_subarrays_response import PutDataSubarraysResponse
-from etptypes.energistics.etp.v12.protocol.data_array.put_uninitialized_data_arrays_response import PutUninitializedDataArraysResponse
-from etptypes.energistics.etp.v12.protocol.data_array.get_data_arrays_response import GetDataArraysResponse
-from etptypes.energistics.etp.v12.protocol.data_array.get_data_subarrays_response import GetDataSubarraysResponse
-from etptypes.energistics.etp.v12.protocol.data_array.get_data_array_metadata import GetDataArrayMetadata
-from etptypes.energistics.etp.v12.protocol.data_array.get_data_arrays import GetDataArrays
-from etptypes.energistics.etp.v12.protocol.data_array.get_data_subarrays import GetDataSubarrays
-from etptypes.energistics.etp.v12.protocol.data_array.get_data_array_metadata_response import GetDataArrayMetadataResponse
-from etptypes.energistics.etp.v12.protocol.data_array.put_data_arrays import PutDataArrays
-from etptypes.energistics.etp.v12.protocol.data_array.put_data_subarrays import PutDataSubarrays
-from etptypes.energistics.etp.v12.protocol.data_array.put_uninitialized_data_arrays import PutUninitializedDataArrays
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_add_to_store import WMLS_AddToStore
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_add_to_store_response import WMLS_AddToStoreResponse
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_delete_from_store import WMLS_DeleteFromStore
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_delete_from_store_response import WMLS_DeleteFromStoreResponse
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_get_base_msg import WMLS_GetBaseMsg
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_get_cap import WMLS_GetCap
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_get_base_msg_response import WMLS_GetBaseMsgResponse
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_get_from_store import WMLS_GetFromStore
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_get_cap_response import WMLS_GetCapResponse
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_get_from_store_response import WMLS_GetFromStoreResponse
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_get_version import WMLS_GetVersion
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_get_version_response import WMLS_GetVersionResponse
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_update_in_store import WMLS_UpdateInStore
+from etptypes.energistics.etp.v12.private_protocols.witsml_soap.wmls_update_in_store_response import WMLS_UpdateInStoreResponse
 
 
 @dataclass
-class DataArrayHandler(Protocol):
-    protocol_id: ClassVar[int] = 9
-    protocol_name: ClassVar[str] = "DataArray"
-    protocol_namespace: ClassVar[str] = "Energistics.Etp.v12.Protocol.DataArray"
+class WitsmlSoapHandler(Protocol):
+    protocol_id: ClassVar[int] = 2100
+    protocol_name: ClassVar[str] = "WitsmlSoap"
+    protocol_namespace: ClassVar[str] = "Energistics.Etp.v12.PrivateProtocols.WitsmlSoap"
 
     async def handle_message(
         self,
@@ -55,95 +57,15 @@ class DataArrayHandler(Protocol):
 
     # Define handlers for each message type in the protocol
 
-    async def on_put_data_arrays_response(
+    async def on_wmls_add_to_store(
         self,
-        msg: PutDataArraysResponse,
+        msg: WMLS_AddToStore,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for PutDataArraysResponse messages.
-        Message Type: 10
-        Sender Role: store
-        Multipart: True
-        '''
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_put_data_subarrays_response(
-        self,
-        msg: PutDataSubarraysResponse,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        '''
-        Handler for PutDataSubarraysResponse messages.
-        Message Type: 11
-        Sender Role: store
-        Multipart: True
-        '''
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_put_uninitialized_data_arrays_response(
-        self,
-        msg: PutUninitializedDataArraysResponse,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        '''
-        Handler for PutUninitializedDataArraysResponse messages.
-        Message Type: 12
-        Sender Role: store
-        Multipart: True
-        '''
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_get_data_arrays_response(
-        self,
-        msg: GetDataArraysResponse,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        '''
-        Handler for GetDataArraysResponse messages.
+        Handler for WMLS_AddToStore messages.
         Message Type: 1
-        Sender Role: store
-        Multipart: True
-        '''
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_get_data_subarrays_response(
-        self,
-        msg: GetDataSubarraysResponse,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        '''
-        Handler for GetDataSubarraysResponse messages.
-        Message Type: 8
-        Sender Role: store
-        Multipart: True
-        '''
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_get_data_array_metadata(
-        self,
-        msg: GetDataArrayMetadata,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        '''
-        Handler for GetDataArrayMetadata messages.
-        Message Type: 6
         Sender Role: customer
         Multipart: False
         '''
@@ -151,30 +73,30 @@ class DataArrayHandler(Protocol):
             correlation_id=msg_header.message_id
         )
 
-    async def on_get_data_arrays(
+    async def on_wmls_add_to_store_response(
         self,
-        msg: GetDataArrays,
+        msg: WMLS_AddToStoreResponse,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for GetDataArrays messages.
+        Handler for WMLS_AddToStoreResponse messages.
         Message Type: 2
-        Sender Role: customer
+        Sender Role: store
         Multipart: False
         '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
 
-    async def on_get_data_subarrays(
+    async def on_wmls_delete_from_store(
         self,
-        msg: GetDataSubarrays,
+        msg: WMLS_DeleteFromStore,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for GetDataSubarrays messages.
+        Handler for WMLS_DeleteFromStore messages.
         Message Type: 3
         Sender Role: customer
         Multipart: False
@@ -183,46 +105,30 @@ class DataArrayHandler(Protocol):
             correlation_id=msg_header.message_id
         )
 
-    async def on_get_data_array_metadata_response(
+    async def on_wmls_delete_from_store_response(
         self,
-        msg: GetDataArrayMetadataResponse,
+        msg: WMLS_DeleteFromStoreResponse,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for GetDataArrayMetadataResponse messages.
-        Message Type: 7
-        Sender Role: store
-        Multipart: True
-        '''
-        yield NotSupportedError().to_etp_message(
-            correlation_id=msg_header.message_id
-        )
-
-    async def on_put_data_arrays(
-        self,
-        msg: PutDataArrays,
-        msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo] = None,
-    ) -> AsyncGenerator[Optional[Message], None]:
-        '''
-        Handler for PutDataArrays messages.
+        Handler for WMLS_DeleteFromStoreResponse messages.
         Message Type: 4
-        Sender Role: customer
+        Sender Role: store
         Multipart: False
         '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
 
-    async def on_put_data_subarrays(
+    async def on_wmls_get_base_msg(
         self,
-        msg: PutDataSubarrays,
+        msg: WMLS_GetBaseMsg,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for PutDataSubarrays messages.
+        Handler for WMLS_GetBaseMsg messages.
         Message Type: 5
         Sender Role: customer
         Multipart: False
@@ -231,16 +137,144 @@ class DataArrayHandler(Protocol):
             correlation_id=msg_header.message_id
         )
 
-    async def on_put_uninitialized_data_arrays(
+    async def on_wmls_get_cap(
         self,
-        msg: PutUninitializedDataArrays,
+        msg: WMLS_GetCap,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for PutUninitializedDataArrays messages.
+        Handler for WMLS_GetCap messages.
+        Message Type: 7
+        Sender Role: customer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_wmls_get_base_msg_response(
+        self,
+        msg: WMLS_GetBaseMsgResponse,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for WMLS_GetBaseMsgResponse messages.
+        Message Type: 6
+        Sender Role: store
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_wmls_get_from_store(
+        self,
+        msg: WMLS_GetFromStore,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for WMLS_GetFromStore messages.
         Message Type: 9
         Sender Role: customer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_wmls_get_cap_response(
+        self,
+        msg: WMLS_GetCapResponse,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for WMLS_GetCapResponse messages.
+        Message Type: 8
+        Sender Role: store
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_wmls_get_from_store_response(
+        self,
+        msg: WMLS_GetFromStoreResponse,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for WMLS_GetFromStoreResponse messages.
+        Message Type: 10
+        Sender Role: store
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_wmls_get_version(
+        self,
+        msg: WMLS_GetVersion,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for WMLS_GetVersion messages.
+        Message Type: 11
+        Sender Role: customer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_wmls_get_version_response(
+        self,
+        msg: WMLS_GetVersionResponse,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for WMLS_GetVersionResponse messages.
+        Message Type: 12
+        Sender Role: store
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_wmls_update_in_store(
+        self,
+        msg: WMLS_UpdateInStore,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for WMLS_UpdateInStore messages.
+        Message Type: 13
+        Sender Role: customer
+        Multipart: False
+        '''
+        yield NotSupportedError().to_etp_message(
+            correlation_id=msg_header.message_id
+        )
+
+    async def on_wmls_update_in_store_response(
+        self,
+        msg: WMLS_UpdateInStoreResponse,
+        msg_header: MessageHeader,
+        client_info: Union[None, ClientInfo] = None,
+    ) -> AsyncGenerator[Optional[Message], None]:
+        '''
+        Handler for WMLS_UpdateInStoreResponse messages.
+        Message Type: 14
+        Sender Role: store
         Multipart: False
         '''
         yield NotSupportedError().to_etp_message(

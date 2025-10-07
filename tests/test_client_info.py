@@ -4,7 +4,7 @@
 import pytest
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from etptypes.energistics.etp.v12.protocol.core.open_session import OpenSession
 from etptypes.energistics.etp.v12.protocol.core.request_session import (
@@ -23,70 +23,86 @@ from etpproto.client_info import ClientInfo
 from etpproto.connection import ETPConnection
 
 
+from etptypes.energistics.etp.v12.datatypes.endpoint_capability_kind import (
+    EndpointCapabilityKind,
+)
+
 etp_version = Version(major=1, minor=2, revision=0, patch=0)
 
 local_protocols = [
     SupportedProtocol(
         protocol=0,
-        protocol_version=etp_version,
+        protocolVersion=etp_version,
         role="server",
-        protocol_capabilities={},
+        protocolCapabilities={},
     ),
     SupportedProtocol(
         protocol=3,
-        protocol_version=etp_version,
+        protocolVersion=etp_version,
         role="store",
-        protocol_capabilities={},
+        protocolCapabilities={},
     ),
 ]
 
 supported_objects = [
     SupportedDataObject(
-        qualified_type="resqml20",
-        data_object_capabilities={},
+        qualifiedType="resqml20",
+        dataObjectCapabilities={},
     )
 ]
 
 supportedProtocolList = ETPConnection.get_supported_protocol_list()
 
 my_open_session = OpenSession(
-    application_name="etpproto",
-    application_version="1.0",
-    server_instance_id=uuid.uuid4(),
-    supported_protocols=supportedProtocolList,
-    supported_data_objects=[
+    applicationName="etpproto",
+    applicationVersion="1.0",
+    serverInstanceId=uuid.uuid4(),
+    supportedProtocols=supportedProtocolList,
+    supportedDataObjects=[
         SupportedDataObject(
-            qualified_type="resqml20",
-            data_object_capabilities={},
+            qualifiedType="resqml20",
+            dataObjectCapabilities={},
         )
     ],
-    supported_compression="string",
-    supported_formats=["xml"],
-    session_id=uuid.uuid4(),
-    current_date_time=int(datetime.utcnow().timestamp()),
-    endpoint_capabilities={
-        "MaxWebSocketFramePayloadSize": DataValue(item=666),
-        "MaxWebSocketMessagePayloadSize": DataValue(item=10000000),
-        "SupportsAlternateRequestUris": DataValue(item=True),
+    supportedCompression="string",
+    supportedFormats=["xml"],
+    sessionId=uuid.uuid4(),
+    currentDateTime=int(datetime.now(timezone.utc).timestamp()),
+    endpointCapabilities={
+        EndpointCapabilityKind.MAX_WEB_SOCKET_FRAME_PAYLOAD_SIZE.value: DataValue(
+            item=666
+        ),
+        EndpointCapabilityKind.MAX_WEB_SOCKET_MESSAGE_PAYLOAD_SIZE.value: DataValue(
+            item=10000000
+        ),
+        EndpointCapabilityKind.SUPPORTS_ALTERNATE_REQUEST_URIS.value: DataValue(
+            item=True
+        ),
     },
-    earliest_retained_change_time=int(datetime.utcnow().timestamp()),
+    earliestRetainedChangeTime=int(datetime.now(timezone.utc).timestamp()),
 )
 
 my_request_session = RequestSession(
-    application_name="WebStudio",
-    application_version="1.2",
-    client_instance_id=uuid.uuid4(),
-    requested_protocols=local_protocols,
-    supported_data_objects=supported_objects,
-    supported_compression=["string"],
-    supported_formats=["xml"],
-    current_date_time=int(datetime.utcnow().timestamp()),
-    endpoint_capabilities={
-        "MaxWebSocketFramePayloadSize": DataValue(item=10000000),
-        "MaxWebSocketMessagePayloadSize": DataValue(item=42),
-        "SupportsAlternateRequestUris": DataValue(item=False),
+    applicationName="WebStudio",
+    applicationVersion="1.2",
+    clientInstanceId=uuid.uuid4(),
+    requestedProtocols=local_protocols,
+    supportedDataObjects=supported_objects,
+    supportedCompression=["string"],
+    supportedFormats=["xml"],
+    currentDateTime=int(datetime.now(timezone.utc).timestamp()),
+    endpointCapabilities={
+        EndpointCapabilityKind.MAX_WEB_SOCKET_FRAME_PAYLOAD_SIZE.value: DataValue(
+            item=10000000
+        ),
+        EndpointCapabilityKind.MAX_WEB_SOCKET_MESSAGE_PAYLOAD_SIZE.value: DataValue(
+            item=42
+        ),
+        EndpointCapabilityKind.SUPPORTS_ALTERNATE_REQUEST_URIS.value: DataValue(
+            item=False
+        ),
     },
-    earliest_retained_change_time=int(datetime.utcnow().timestamp()),
+    earliestRetainedChangeTime=int(datetime.now(timezone.utc).timestamp()),
 )
 
 
@@ -94,11 +110,21 @@ def test_negotiate_open_ession() -> None:
     client = ClientInfo()
     client.negotiate(my_open_session)
 
-    assert client.endpoint_capabilities["MaxWebSocketFramePayloadSize"] == 666
     assert (
-        client.endpoint_capabilities["MaxWebSocketMessagePayloadSize"] == 10000
+        client.endpoint_capabilities[
+            EndpointCapabilityKind.MAX_WEB_SOCKET_FRAME_PAYLOAD_SIZE.value
+        ]
+        == 666
     )
-    assert client.endpoint_capabilities["SupportsAlternateRequestUris"]
+    assert (
+        client.endpoint_capabilities[
+            EndpointCapabilityKind.MAX_WEB_SOCKET_MESSAGE_PAYLOAD_SIZE.value
+        ]
+        == 10000
+    )
+    assert client.endpoint_capabilities[
+        EndpointCapabilityKind.SUPPORTS_ALTERNATE_REQUEST_URIS.value
+    ]
 
 
 def test_negotiate_request_session() -> None:
@@ -106,7 +132,17 @@ def test_negotiate_request_session() -> None:
     client.negotiate(my_request_session)
 
     assert (
-        client.endpoint_capabilities["MaxWebSocketFramePayloadSize"] == 10000
+        client.endpoint_capabilities[
+            EndpointCapabilityKind.MAX_WEB_SOCKET_FRAME_PAYLOAD_SIZE.value
+        ]
+        == 10000
     )
-    assert client.endpoint_capabilities["MaxWebSocketMessagePayloadSize"] == 42
-    assert not client.endpoint_capabilities["SupportsAlternateRequestUris"]
+    assert (
+        client.endpoint_capabilities[
+            EndpointCapabilityKind.MAX_WEB_SOCKET_MESSAGE_PAYLOAD_SIZE.value
+        ]
+        == 42
+    )
+    assert not client.endpoint_capabilities[
+        EndpointCapabilityKind.SUPPORTS_ALTERNATE_REQUEST_URIS.value
+    ]

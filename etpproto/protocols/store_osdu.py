@@ -13,15 +13,15 @@ from etpproto.utils import snake_case
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
 
-from etptypes.energistics.etp.v12.protocol.growing_object_query.find_parts import FindParts
-from etptypes.energistics.etp.v12.protocol.growing_object_query.find_parts_response import FindPartsResponse
+from etptypes.energistics.etp.v12.protocol.store_osdu.copy_data_objects_by_value import CopyDataObjectsByValue
+from etptypes.energistics.etp.v12.protocol.store_osdu.copy_data_objects_by_value_response import CopyDataObjectsByValueResponse
 
 
 @dataclass
-class GrowingObjectQueryHandler(Protocol):
-    protocol_id: ClassVar[int] = 16
-    protocol_name: ClassVar[str] = "GrowingObjectQuery"
-    protocol_namespace: ClassVar[str] = "Energistics.Etp.v12.Protocol.GrowingObjectQuery"
+class StoreOSDUHandler(Protocol):
+    protocol_id: ClassVar[int] = 2404
+    protocol_name: ClassVar[str] = "StoreOSDU"
+    protocol_namespace: ClassVar[str] = "Energistics.Etp.v12.Protocol.StoreOSDU"
 
     async def handle_message(
         self,
@@ -45,14 +45,14 @@ class GrowingObjectQueryHandler(Protocol):
 
     # Define handlers for each message type in the protocol
 
-    async def on_find_parts(
+    async def on_copy_data_objects_by_value(
         self,
-        msg: FindParts,
+        msg: CopyDataObjectsByValue,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for FindParts messages.
+        Handler for CopyDataObjectsByValue messages.
         Message Type: 1
         Sender Role: customer
         Multipart: False
@@ -61,14 +61,14 @@ class GrowingObjectQueryHandler(Protocol):
             correlation_id=msg_header.message_id
         )
 
-    async def on_find_parts_response(
+    async def on_copy_data_objects_by_value_response(
         self,
-        msg: FindPartsResponse,
+        msg: CopyDataObjectsByValueResponse,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         '''
-        Handler for FindPartsResponse messages.
+        Handler for CopyDataObjectsByValueResponse messages.
         Message Type: 2
         Sender Role: store
         Multipart: True

@@ -33,7 +33,7 @@ priority = "explicit"
 
 [tool.poetry.dependencies]
 fastavro = "^1.6.1"
-etptypes = "^1.0.12"
+etptypes = "^1.2.0"
 # etptypes = {version = "^1.0.4", allow-prereleases = true, source = "test-pypi"}
 # etptypes = { file = "D:/Geosiris/Github/etp/etptypes-python/tmp/etptypes/dist/etptypes-1.0.11.dev5-py3-none-any.whl" }
 # etptypes = { file = "D:/Geosiris/Github/etp/avro-to-python/tmp/etptypes/dist/etptypes-1.0.11-py3-none-any.whl" }
