@@ -26,6 +26,8 @@ from etptypes.energistics.etp.v12.datatypes.server_capabilities import (
 from etptypes.energistics.etp.v12.datatypes.supported_protocol import (
     SupportedProtocol,
 )
+from etptypes.energistics.etp.v12.datatypes.version import Version
+
 from etptypes.energistics.etp.v12.protocol.core.acknowledge import Acknowledge
 from etptypes.energistics.etp.v12.protocol.core.close_session import (
     CloseSession,
@@ -61,7 +63,10 @@ class Protocol:
         etp_object: object,
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
-    ) -> Generator[Optional[Message], None]:
+    ) -> Union[
+        Generator[Optional[Message], None],
+        AsyncGenerator[Optional[Message], None],
+    ]:
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -144,7 +149,7 @@ class ETPConnection:
         get_all_etp_protocol_classes()
     )
 
-    transition_table: ClassVar[Dict[CommunicationProtocol, Protocol]] = {}
+    transition_table: ClassVar[Dict[int, Protocol]] = {}
 
     server_capabilities: Optional[ServerCapabilities] = field(default=None)
 
@@ -327,9 +332,9 @@ class ETPConnection:
                             try:
                                 # Test si le protocol est supporte par le serveur
                                 if (
-                                    CommunicationProtocol.from_value(
-                                        etp_input_msg.header.protocol
-                                    )
+                                    # CommunicationProtocol.from_value(
+                                    etp_input_msg.header.protocol
+                                    # )
                                     in self.transition_table
                                 ):
                                     # demande la reponse au protocols du serveur
@@ -337,9 +342,9 @@ class ETPConnection:
                                         async for (
                                             handled
                                         ) in self.transition_table[
-                                            CommunicationProtocol.from_value(
-                                                etp_input_msg.header.protocol
-                                            )
+                                            # CommunicationProtocol.from_value(
+                                            etp_input_msg.header.protocol
+                                            # )
                                         ].handle_message(
                                             etp_object=etp_input_msg.body,
                                             msg_header=etp_input_msg.header,
@@ -462,12 +467,20 @@ class ETPConnection:
 
     @classmethod
     def on(
-        cls: Type[ETPConnection], protocol: CommunicationProtocol
+        cls: Type[ETPConnection],
+        protocol: Optional[int] = None,
     ) -> Callable[[Type[Protocol]], Type[Protocol]]:
         """Should only be used to decorate classes."""
 
         def decorate(cls_protocol: Type[Protocol]) -> Type[Protocol]:
-            cls.transition_table[protocol] = cls_protocol()
+            proto = protocol
+            if proto is None:
+                if hasattr(cls_protocol, "protocol_id"):
+                    proto = getattr(cls_protocol, "protocol_id")
+            elif isinstance(proto, CommunicationProtocol):
+                proto = proto.value
+            print(f"Register protocol {proto} to {cls_protocol}")
+            cls.transition_table[proto] = cls_protocol()
             return cls_protocol
 
         return decorate
@@ -490,18 +503,18 @@ class ETPConnection:
     ) -> List[SupportedProtocol]:
         supported_protocols: List[SupportedProtocol] = []
         for protocol in cls.transition_table:
-            if protocol.value != CommunicationProtocol.CORE:
+            if protocol != CommunicationProtocol.CORE.value:
                 supported_protocols.append(
                     SupportedProtocol(
-                        protocol=protocol.value,
-                        protocol_version={
-                            "major": 1,
-                            "minor": 2,
-                            "patch": 0,
-                            "revision": 0,
-                        },
+                        protocol=protocol,
+                        protocolVersion=Version(
+                            major=1,
+                            minor=2,
+                            patch=0,
+                            revision=0,
+                        ),
                         role="server",
-                        protocol_capabilities={},
+                        protocolCapabilities={},
                     )
                 )
         return supported_protocols

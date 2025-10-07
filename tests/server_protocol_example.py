@@ -228,8 +228,11 @@ from etpproto.protocols.core import CoreHandler
 from etpproto.protocols.store import StoreHandler
 from etpproto.protocols.dataspace import DataspaceHandler
 from etpproto.protocols.discovery import DiscoveryHandler
+from etpproto.protocols.data_array import DataArrayHandler
 from etpproto.protocols.discovery_query import DiscoveryQueryHandler
-from etpproto.protocols.growing_object_query import GrowingObjectQueryHandler
+from etpproto.protocols.growing_object_query import (
+    GrowingObjectQueryHandler,
+)
 from etpproto.protocols.store_query import StoreQueryHandler
 from etpproto.protocols.growing_object import GrowingObjectHandler
 
@@ -241,60 +244,59 @@ from etpproto.protocols.growing_object import GrowingObjectHandler
 #                        /_/
 
 
-@ETPConnection.on(CommunicationProtocol.CORE)
-class myCoreProtocol(CoreHandler):
+@ETPConnection.on()
+class MyCoreProtocol(CoreHandler):
     async def on_request_session(
         self,
         msg: RequestSession,
         msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo],
+        client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         print("RequestSession recieved, answer with OpenSession")
-        supportedProtocolList = ETPConnection.get_supported_protocol_list()
-        openSession = OpenSession(
-            application_name="etpproto",
-            application_version="1.0",
-            server_instance_id=uuid.uuid4(),
-            supported_protocols=supportedProtocolList,
-            supported_data_objects=[
+        supported_protocol_list = ETPConnection.get_supported_protocol_list()
+        open_session = OpenSession(
+            applicationName="etpproto",
+            applicationVersion="1.0",
+            serverInstanceId=uuid.uuid4(),
+            supportedProtocols=supported_protocol_list,
+            supportedDataObjects=[
                 SupportedDataObject(
-                    qualified_type="resqml20",
-                    data_object_capabilities={},
+                    qualifiedType="resqml20",
+                    dataObjectCapabilities={},
                 )
             ],
-            supported_compression="string",
-            supported_formats=["xml"],
-            session_id=msg.client_instance_id,
-            current_date_time=int(datetime.now(timezone.utc).timestamp()),
-            endpoint_capabilities={},
-            earliest_retained_change_time=int(
+            supportedCompression="string",
+            supportedFormats=["xml"],
+            sessionId=msg.client_instance_id,
+            currentDateTime=int(datetime.now(timezone.utc).timestamp()),
+            endpointCapabilities={},
+            earliestRetainedChangeTime=int(
                 datetime.now(timezone.utc).timestamp()
             ),
         )
         # TODO: Attention ici le msgId est mauvais il faudra le changer a posteriori
         yield Message.get_object_message(
-            openSession, correlation_id=msg_header.message_id
+            open_session, correlation_id=msg_header.message_id
         )
 
     async def on_close_session(
         self,
         msg: CloseSession,
         msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo],
+        client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         print("closing")
+        yield
 
     async def on_ping(
         self,
         msg: Ping,
         msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo],
+        client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         print("#Core : Ping recieved")
         yield Message.get_object_message(
-            Pong(
-                current_date_time=int(datetime.now(timezone.utc).timestamp())
-            ),
+            Pong(currentDateTime=int(datetime.now(timezone.utc).timestamp())),
             correlation_id=msg_header.message_id,
         )
 
@@ -302,9 +304,10 @@ class myCoreProtocol(CoreHandler):
         self,
         msg: Pong,
         msg_header: MessageHeader,
-        client_info: Union[None, ClientInfo],
+        client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
         print("#Core : Pong recieved")
+        yield
 
     async def on_authorize(
         self,
@@ -349,8 +352,8 @@ class myCoreProtocol(CoreHandler):
         yield None
 
 
-@ETPConnection.on(CommunicationProtocol.STORE)
-class myStoreProtocol(StoreHandler):
+@ETPConnection.on()
+class MyStoreProtocol(StoreHandler):
     async def on_get_data_objects_response(
         self,
         msg: GetDataObjectsResponse,
@@ -363,8 +366,8 @@ class myStoreProtocol(StoreHandler):
         )
 
 
-@ETPConnection.on(CommunicationProtocol.DATASPACE)
-class myDataspaceProtocol(DataspaceHandler):
+@ETPConnection.on()
+class MyDataspaceProtocol(DataspaceHandler):
     async def on_delete_dataspaces(
         self,
         msg: DeleteDataspaces,
@@ -424,8 +427,8 @@ class myDataspaceProtocol(DataspaceHandler):
 #                        /_____/
 
 
-@ETPConnection.on(CommunicationProtocol.DATA_ARRAY)
-class myDataArrayProtocol(DataArrayHandler):
+@ETPConnection.on()
+class MyDataArrayProtocol(DataArrayHandler):
     async def on_get_data_array_metadata(
         self,
         msg: GetDataArrayMetadata,
@@ -507,7 +510,7 @@ class myDataArrayProtocol(DataArrayHandler):
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
             PutDataSubarraysResponse(
-                success={k: True for k, v in msg.data_subarrays.items()}
+                success={k: "True" for k, v in msg.data_subarrays.items()}
             ),
             correlation_id=msg_header.message_id,
         )
@@ -520,7 +523,7 @@ class myDataArrayProtocol(DataArrayHandler):
     ) -> AsyncGenerator[Optional[Message], None]:
         yield Message.get_object_message(
             PutUninitializedDataArraysResponse(
-                success={k: True for k, v in msg.data_arrays.items()}
+                success={k: "True" for k, v in msg.data_arrays.items()}
             ),
             correlation_id=msg_header.message_id,
         )
@@ -534,7 +537,7 @@ class myDataArrayProtocol(DataArrayHandler):
 #                                        /____/
 
 
-@ETPConnection.on(CommunicationProtocol.DISCOVERY)
+@ETPConnection.on()
 class MyDiscoveryHandler(DiscoveryHandler):
     async def on_get_deleted_resources(
         self,
@@ -601,7 +604,7 @@ class MyDiscoveryHandler(DiscoveryHandler):
 #                                        /____/                      /____/
 
 
-@ETPConnection.on(CommunicationProtocol.DISCOVERY_QUERY)
+@ETPConnection.on()
 class MyDiscoveryQueryHandler(DiscoveryQueryHandler):
     async def on_find_resources(
         self,
@@ -647,7 +650,7 @@ class MyDiscoveryQueryHandler(DiscoveryQueryHandler):
 #                                 /____/           /___/                                    /____/
 
 
-@ETPConnection.on(CommunicationProtocol.GROWING_OBJECT_QUERY)
+@ETPConnection.on()
 class MyGrowingObjectQueryHandler(GrowingObjectQueryHandler):
     async def on_find_parts(
         self,
@@ -674,7 +677,7 @@ class MyGrowingObjectQueryHandler(GrowingObjectQueryHandler):
 #                                                /____/
 
 
-@ETPConnection.on(CommunicationProtocol.STORE_QUERY)
+@ETPConnection.on()
 class MyStoreQueryHandler(StoreQueryHandler):
     async def on_find_data_objects(
         self,
@@ -715,7 +718,7 @@ class MyStoreQueryHandler(StoreQueryHandler):
 #                                 /____/           /___/
 
 
-@ETPConnection.on(CommunicationProtocol.GROWING_OBJECT)
+@ETPConnection.on()
 class MyGrowingObjectHandler(GrowingObjectHandler):
     async def on_delete_parts(
         self,
