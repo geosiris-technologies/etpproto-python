@@ -12,6 +12,7 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.channel_data_load.channels_closed import ChannelsClosed
 from etptypes.energistics.etp.v12.protocol.channel_data_load.close_channels import CloseChannels
 from etptypes.energistics.etp.v12.protocol.channel_data_load.open_channels import OpenChannels
@@ -21,6 +22,7 @@ from etptypes.energistics.etp.v12.protocol.channel_data_load.channel_data import
 from etptypes.energistics.etp.v12.protocol.channel_data_load.truncate_channels import TruncateChannels
 from etptypes.energistics.etp.v12.protocol.channel_data_load.replace_range import ReplaceRange
 from etptypes.energistics.etp.v12.protocol.channel_data_load.open_channels_response import OpenChannelsResponse
+
 
 @dataclass
 class ChannelDataLoadHandler(Protocol):
@@ -49,7 +51,6 @@ class ChannelDataLoadHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_channels_closed(
         self,

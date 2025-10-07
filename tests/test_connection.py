@@ -20,6 +20,11 @@ from etpproto.error import (
     InvalidMessageError,
     InvalidStateError,
 )
+from etpproto.connection import (
+    ETPConnection,
+    ConnectionType,
+    Protocol,
+)
 
 try:
     from .server_protocol_example import *

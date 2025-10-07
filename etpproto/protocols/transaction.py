@@ -12,12 +12,14 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.transaction.start_transaction import StartTransaction
 from etptypes.energistics.etp.v12.protocol.transaction.commit_transaction import CommitTransaction
 from etptypes.energistics.etp.v12.protocol.transaction.commit_transaction_response import CommitTransactionResponse
 from etptypes.energistics.etp.v12.protocol.transaction.rollback_transaction import RollbackTransaction
 from etptypes.energistics.etp.v12.protocol.transaction.rollback_transaction_response import RollbackTransactionResponse
 from etptypes.energistics.etp.v12.protocol.transaction.start_transaction_response import StartTransactionResponse
+
 
 @dataclass
 class TransactionHandler(Protocol):
@@ -46,7 +48,6 @@ class TransactionHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_start_transaction(
         self,

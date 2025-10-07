@@ -12,6 +12,7 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.channel_subscribe.get_channel_metadata import GetChannelMetadata
 from etptypes.energistics.etp.v12.protocol.channel_subscribe.subscribe_channels_response import SubscribeChannelsResponse
 from etptypes.energistics.etp.v12.protocol.channel_subscribe.subscriptions_stopped import SubscriptionsStopped
@@ -26,6 +27,7 @@ from etptypes.energistics.etp.v12.protocol.channel_subscribe.range_replaced impo
 from etptypes.energistics.etp.v12.protocol.channel_subscribe.get_ranges import GetRanges
 from etptypes.energistics.etp.v12.protocol.channel_subscribe.get_channel_metadata_response import GetChannelMetadataResponse
 from etptypes.energistics.etp.v12.protocol.channel_subscribe.get_change_annotations_response import GetChangeAnnotationsResponse
+
 
 @dataclass
 class ChannelSubscribeHandler(Protocol):
@@ -54,7 +56,6 @@ class ChannelSubscribeHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_get_channel_metadata(
         self,

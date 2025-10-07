@@ -1,3 +1,4 @@
+
 # Copyright (c) 2022-2023 Geosiris.
 # SPDX-License-Identifier: Apache-2.0
 from typing import AsyncGenerator, Optional, Union, ClassVar
@@ -11,23 +12,16 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.core.acknowledge import Acknowledge
 from etptypes.energistics.etp.v12.protocol.core.authorize import Authorize
-from etptypes.energistics.etp.v12.protocol.core.authorize_response import (
-    AuthorizeResponse,
-)
-from etptypes.energistics.etp.v12.protocol.core.close_session import (
-    CloseSession,
-)
+from etptypes.energistics.etp.v12.protocol.core.authorize_response import AuthorizeResponse
+from etptypes.energistics.etp.v12.protocol.core.close_session import CloseSession
 from etptypes.energistics.etp.v12.protocol.core.pong import Pong
 from etptypes.energistics.etp.v12.protocol.core.ping import Ping
-from etptypes.energistics.etp.v12.protocol.core.protocol_exception import (
-    ProtocolException,
-)
+from etptypes.energistics.etp.v12.protocol.core.protocol_exception import ProtocolException
 from etptypes.energistics.etp.v12.protocol.core.open_session import OpenSession
-from etptypes.energistics.etp.v12.protocol.core.request_session import (
-    RequestSession,
-)
+from etptypes.energistics.etp.v12.protocol.core.request_session import RequestSession
 
 
 @dataclass
@@ -64,12 +58,12 @@ class CoreHandler(Protocol):
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
-        """
+        '''
         Handler for Acknowledge messages.
         Message Type: 1001
         Sender Role: *
         Multipart: False
-        """
+        '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -80,12 +74,12 @@ class CoreHandler(Protocol):
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
-        """
+        '''
         Handler for Authorize messages.
         Message Type: 6
         Sender Role: client,server
         Multipart: False
-        """
+        '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -96,12 +90,12 @@ class CoreHandler(Protocol):
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
-        """
+        '''
         Handler for AuthorizeResponse messages.
         Message Type: 7
         Sender Role: client,server
         Multipart: False
-        """
+        '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -112,12 +106,12 @@ class CoreHandler(Protocol):
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
-        """
+        '''
         Handler for CloseSession messages.
         Message Type: 5
         Sender Role: client,server
         Multipart: False
-        """
+        '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -128,12 +122,12 @@ class CoreHandler(Protocol):
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
-        """
+        '''
         Handler for Pong messages.
         Message Type: 9
         Sender Role: client,server
         Multipart: False
-        """
+        '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -144,12 +138,12 @@ class CoreHandler(Protocol):
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
-        """
+        '''
         Handler for Ping messages.
         Message Type: 8
         Sender Role: client,server
         Multipart: False
-        """
+        '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -160,12 +154,12 @@ class CoreHandler(Protocol):
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
-        """
+        '''
         Handler for ProtocolException messages.
         Message Type: 1000
         Sender Role: *
         Multipart: True
-        """
+        '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -176,12 +170,12 @@ class CoreHandler(Protocol):
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
-        """
+        '''
         Handler for OpenSession messages.
         Message Type: 2
         Sender Role: server
         Multipart: False
-        """
+        '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )
@@ -192,12 +186,12 @@ class CoreHandler(Protocol):
         msg_header: MessageHeader,
         client_info: Union[None, ClientInfo] = None,
     ) -> AsyncGenerator[Optional[Message], None]:
-        """
+        '''
         Handler for RequestSession messages.
         Message Type: 1
         Sender Role: client
         Multipart: False
-        """
+        '''
         yield NotSupportedError().to_etp_message(
             correlation_id=msg_header.message_id
         )

@@ -12,6 +12,7 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.data_array.put_data_arrays_response import PutDataArraysResponse
 from etptypes.energistics.etp.v12.protocol.data_array.put_data_subarrays_response import PutDataSubarraysResponse
 from etptypes.energistics.etp.v12.protocol.data_array.put_uninitialized_data_arrays_response import PutUninitializedDataArraysResponse
@@ -24,6 +25,7 @@ from etptypes.energistics.etp.v12.protocol.data_array.get_data_array_metadata_re
 from etptypes.energistics.etp.v12.protocol.data_array.put_data_arrays import PutDataArrays
 from etptypes.energistics.etp.v12.protocol.data_array.put_data_subarrays import PutDataSubarrays
 from etptypes.energistics.etp.v12.protocol.data_array.put_uninitialized_data_arrays import PutUninitializedDataArrays
+
 
 @dataclass
 class DataArrayHandler(Protocol):
@@ -52,7 +54,6 @@ class DataArrayHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_put_data_arrays_response(
         self,

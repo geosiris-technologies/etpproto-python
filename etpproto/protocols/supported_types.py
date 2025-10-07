@@ -12,8 +12,10 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.supported_types.get_supported_types import GetSupportedTypes
 from etptypes.energistics.etp.v12.protocol.supported_types.get_supported_types_response import GetSupportedTypesResponse
+
 
 @dataclass
 class SupportedTypesHandler(Protocol):
@@ -42,7 +44,6 @@ class SupportedTypesHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_get_supported_types(
         self,

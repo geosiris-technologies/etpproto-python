@@ -12,6 +12,7 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.growing_object.delete_parts import DeleteParts
 from etptypes.energistics.etp.v12.protocol.growing_object.delete_parts_response import DeletePartsResponse
 from etptypes.energistics.etp.v12.protocol.growing_object.get_change_annotations import GetChangeAnnotations
@@ -30,6 +31,7 @@ from etptypes.energistics.etp.v12.protocol.growing_object.replace_parts_by_range
 from etptypes.energistics.etp.v12.protocol.growing_object.get_parts_metadata_response import GetPartsMetadataResponse
 from etptypes.energistics.etp.v12.protocol.growing_object.get_growing_data_objects_header_response import GetGrowingDataObjectsHeaderResponse
 from etptypes.energistics.etp.v12.protocol.growing_object.put_growing_data_objects_header import PutGrowingDataObjectsHeader
+
 
 @dataclass
 class GrowingObjectHandler(Protocol):
@@ -58,7 +60,6 @@ class GrowingObjectHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_delete_parts(
         self,

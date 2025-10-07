@@ -12,11 +12,13 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.channel_streaming.start_streaming import StartStreaming
 from etptypes.energistics.etp.v12.protocol.channel_streaming.stop_streaming import StopStreaming
 from etptypes.energistics.etp.v12.protocol.channel_streaming.channel_data import ChannelData
 from etptypes.energistics.etp.v12.protocol.channel_streaming.truncate_channels import TruncateChannels
 from etptypes.energistics.etp.v12.protocol.channel_streaming.channel_metadata import ChannelMetadata
+
 
 @dataclass
 class ChannelStreamingHandler(Protocol):
@@ -45,7 +47,6 @@ class ChannelStreamingHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_start_streaming(
         self,

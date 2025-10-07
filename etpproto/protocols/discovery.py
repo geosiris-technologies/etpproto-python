@@ -12,11 +12,13 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.discovery.get_deleted_resources import GetDeletedResources
 from etptypes.energistics.etp.v12.protocol.discovery.get_deleted_resources_response import GetDeletedResourcesResponse
 from etptypes.energistics.etp.v12.protocol.discovery.get_resources import GetResources
 from etptypes.energistics.etp.v12.protocol.discovery.get_resources_edges_response import GetResourcesEdgesResponse
 from etptypes.energistics.etp.v12.protocol.discovery.get_resources_response import GetResourcesResponse
+
 
 @dataclass
 class DiscoveryHandler(Protocol):
@@ -45,7 +47,6 @@ class DiscoveryHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_get_deleted_resources(
         self,

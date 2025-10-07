@@ -12,8 +12,10 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.store_osdu.copy_data_objects_by_value import CopyDataObjectsByValue
 from etptypes.energistics.etp.v12.protocol.store_osdu.copy_data_objects_by_value_response import CopyDataObjectsByValueResponse
+
 
 @dataclass
 class StoreOSDUHandler(Protocol):
@@ -42,7 +44,6 @@ class StoreOSDUHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_copy_data_objects_by_value(
         self,

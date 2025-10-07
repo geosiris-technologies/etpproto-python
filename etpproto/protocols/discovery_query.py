@@ -12,8 +12,10 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.discovery_query.find_resources import FindResources
 from etptypes.energistics.etp.v12.protocol.discovery_query.find_resources_response import FindResourcesResponse
+
 
 @dataclass
 class DiscoveryQueryHandler(Protocol):
@@ -42,7 +44,6 @@ class DiscoveryQueryHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_find_resources(
         self,

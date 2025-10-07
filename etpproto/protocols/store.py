@@ -12,6 +12,7 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.store.delete_data_objects import DeleteDataObjects
 from etptypes.energistics.etp.v12.protocol.store.get_data_objects import GetDataObjects
 from etptypes.energistics.etp.v12.protocol.store.delete_data_objects_response import DeleteDataObjectsResponse
@@ -19,6 +20,7 @@ from etptypes.energistics.etp.v12.protocol.store.chunk import Chunk
 from etptypes.energistics.etp.v12.protocol.store.put_data_objects_response import PutDataObjectsResponse
 from etptypes.energistics.etp.v12.protocol.store.get_data_objects_response import GetDataObjectsResponse
 from etptypes.energistics.etp.v12.protocol.store.put_data_objects import PutDataObjects
+
 
 @dataclass
 class StoreHandler(Protocol):
@@ -47,7 +49,6 @@ class StoreHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_delete_data_objects(
         self,

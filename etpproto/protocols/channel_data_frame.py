@@ -12,12 +12,14 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.channel_data_frame.get_frame_metadata import GetFrameMetadata
 from etptypes.energistics.etp.v12.protocol.channel_data_frame.cancel_get_frame import CancelGetFrame
 from etptypes.energistics.etp.v12.protocol.channel_data_frame.get_frame_response_rows import GetFrameResponseRows
 from etptypes.energistics.etp.v12.protocol.channel_data_frame.get_frame import GetFrame
 from etptypes.energistics.etp.v12.protocol.channel_data_frame.get_frame_metadata_response import GetFrameMetadataResponse
 from etptypes.energistics.etp.v12.protocol.channel_data_frame.get_frame_response_header import GetFrameResponseHeader
+
 
 @dataclass
 class ChannelDataFrameHandler(Protocol):
@@ -46,7 +48,6 @@ class ChannelDataFrameHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_get_frame_metadata(
         self,

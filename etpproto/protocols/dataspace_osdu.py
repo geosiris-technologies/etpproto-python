@@ -12,6 +12,7 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.dataspace_osdu.get_dataspace_info import GetDataspaceInfo
 from etptypes.energistics.etp.v12.protocol.dataspace_osdu.get_dataspace_info_response import GetDataspaceInfoResponse
 from etptypes.energistics.etp.v12.protocol.dataspace_osdu.copy_dataspaces_content import CopyDataspacesContent
@@ -20,6 +21,7 @@ from etptypes.energistics.etp.v12.protocol.dataspace_osdu.lock_dataspaces import
 from etptypes.energistics.etp.v12.protocol.dataspace_osdu.lock_dataspaces_response import LockDataspacesResponse
 from etptypes.energistics.etp.v12.protocol.dataspace_osdu.copy_to_dataspace import CopyToDataspace
 from etptypes.energistics.etp.v12.protocol.dataspace_osdu.copy_to_dataspace_response import CopyToDataspaceResponse
+
 
 @dataclass
 class DataspaceOSDUHandler(Protocol):
@@ -48,7 +50,6 @@ class DataspaceOSDUHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_get_dataspace_info(
         self,

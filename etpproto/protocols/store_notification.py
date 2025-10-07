@@ -12,6 +12,7 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.store_notification.subscribe_notifications_response import SubscribeNotificationsResponse
 from etptypes.energistics.etp.v12.protocol.store_notification.chunk import Chunk
 from etptypes.energistics.etp.v12.protocol.store_notification.object_access_revoked import ObjectAccessRevoked
@@ -22,6 +23,7 @@ from etptypes.energistics.etp.v12.protocol.store_notification.object_active_stat
 from etptypes.energistics.etp.v12.protocol.store_notification.object_changed import ObjectChanged
 from etptypes.energistics.etp.v12.protocol.store_notification.subscribe_notifications import SubscribeNotifications
 from etptypes.energistics.etp.v12.protocol.store_notification.unsolicited_store_notifications import UnsolicitedStoreNotifications
+
 
 @dataclass
 class StoreNotificationHandler(Protocol):
@@ -50,7 +52,6 @@ class StoreNotificationHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_subscribe_notifications_response(
         self,

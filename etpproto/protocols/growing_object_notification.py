@@ -12,6 +12,7 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.growing_object_notification.subscribe_part_notifications_response import SubscribePartNotificationsResponse
 from etptypes.energistics.etp.v12.protocol.growing_object_notification.parts_deleted import PartsDeleted
 from etptypes.energistics.etp.v12.protocol.growing_object_notification.part_subscription_ended import PartSubscriptionEnded
@@ -20,6 +21,7 @@ from etptypes.energistics.etp.v12.protocol.growing_object_notification.parts_cha
 from etptypes.energistics.etp.v12.protocol.growing_object_notification.parts_replaced_by_range import PartsReplacedByRange
 from etptypes.energistics.etp.v12.protocol.growing_object_notification.subscribe_part_notifications import SubscribePartNotifications
 from etptypes.energistics.etp.v12.protocol.growing_object_notification.unsolicited_part_notifications import UnsolicitedPartNotifications
+
 
 @dataclass
 class GrowingObjectNotificationHandler(Protocol):
@@ -48,7 +50,6 @@ class GrowingObjectNotificationHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_subscribe_part_notifications_response(
         self,

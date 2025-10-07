@@ -12,8 +12,10 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.growing_object_query.find_parts import FindParts
 from etptypes.energistics.etp.v12.protocol.growing_object_query.find_parts_response import FindPartsResponse
+
 
 @dataclass
 class GrowingObjectQueryHandler(Protocol):
@@ -42,7 +44,6 @@ class GrowingObjectQueryHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_find_parts(
         self,

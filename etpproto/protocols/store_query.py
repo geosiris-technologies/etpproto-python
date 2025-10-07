@@ -12,9 +12,11 @@ from etpproto.utils import snake_case
 
 from etptypes.energistics.etp.v12.datatypes.message_header import MessageHeader
 
+
 from etptypes.energistics.etp.v12.protocol.store_query.chunk import Chunk
 from etptypes.energistics.etp.v12.protocol.store_query.find_data_objects import FindDataObjects
 from etptypes.energistics.etp.v12.protocol.store_query.find_data_objects_response import FindDataObjectsResponse
+
 
 @dataclass
 class StoreQueryHandler(Protocol):
@@ -43,7 +45,6 @@ class StoreQueryHandler(Protocol):
             raise InvalidMessageTypeError()
 
     # Define handlers for each message type in the protocol
-
 
     async def on_chunk(
         self,
