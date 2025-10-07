@@ -37,6 +37,9 @@ from etpproto.utils import (
 )
 
 
+_MSG_HEADER_SCHEMA = json.loads(mh.avro_schema)
+
+
 class MessageFlags(
     IntFlag
 ):  # enum.Flag class would be a better choice but doesn't work with our operations
@@ -282,8 +285,8 @@ class Message(ABC):
         This means that data will be sent after in chunk messages
         """
         if not self.is_chunk_msg() and self.is_chunkable():
-            if isinstance(self.body.data_objects, list):
-                for do in self.body.data_objects:
+            if isinstance(self.body.data_objects, list):  # type: ignore[attr-defined]
+                for do in self.body.data_objects:  # type: ignore[attr-defined]
                     if not (
                         do.blob_id is not None
                         and (do.data is None or do.data == "")
@@ -370,7 +373,8 @@ class Message(ABC):
         fo = BytesIO(binary)
         recMH = schemaless_reader(
             fo=fo,
-            writer_schema=json.loads(mh.avro_schema),
+            reader_schema=_MSG_HEADER_SCHEMA,
+            writer_schema=_MSG_HEADER_SCHEMA,
             return_record_name=True,
             return_record_name_override=True,
         )
@@ -389,10 +393,11 @@ class Message(ABC):
                     raise NoSupportedProtocolsError()
 
                 # logging.debug("##> len : {len(binary)} posAfterHeaderRead {posAfterHeaderRead} fotell {fo.tell()}")
-
+                _scheme = json.loads(avro_schema(object_class))
                 object_res = schemaless_reader(
                     fo,
-                    json.loads(avro_schema(object_class)),
+                    reader_schema=_scheme,
+                    writer_schema=_scheme,
                     return_record_name=True,
                     return_record_name_override=True,
                 )
@@ -428,10 +433,11 @@ class Message(ABC):
                     ]
 
                     logging.debug(f" ==> object_class {object_class}")
-
+                    _scheme = json.loads(avro_schema(object_class))
                     object_res = schemaless_reader(
                         fo,
-                        json.loads(avro_schema(object_class)),
+                        reader_schema=_scheme,
+                        writer_schema=_scheme,
                         return_record_name=True,
                         return_record_name_override=True,
                     )
@@ -498,7 +504,8 @@ def decode_binary_message(
     fo = BytesIO(binary)
     recMH = schemaless_reader(
         fo=fo,
-        writer_schema=json.loads(mh.avro_schema),
+        writer_schema=_MSG_HEADER_SCHEMA,
+        reader_schema=_MSG_HEADER_SCHEMA,
         return_record_name=True,
         return_record_name_override=True,
     )
@@ -508,7 +515,8 @@ def decode_binary_message(
     ]
     object_res = schemaless_reader(
         fo=fo,
-        writer_schema=json.loads(avro_schema(object_class)),
+        writer_schema=None,
+        reader_schema=json.loads(avro_schema(object_class)),
         return_record_name=True,
         return_record_name_override=True,
     )
